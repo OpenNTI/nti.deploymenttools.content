@@ -1,0 +1,15 @@
+[common]
+backend = local
+
+[local]
+content-store = /srv/content/staging
+content-library = /Library/WebServer/Documents
+
+[authentication]
+aws-access-key = ***REMOVED***
+aws-secret-key = ***REMOVED***
+
+[deployment]
+environment = alpha
+publication-bucket = content.nextthought.com
+staging-bucket = staging.nextthought.com
