@@ -98,7 +98,6 @@ def main():
     config['environment'] = args.environment or configfile.get('deployment', 'environment')
     config['content-store'] = content_path or configfile.get('local', 'content-store')
     config['content-library'] = args.content_library or configfile.get('local', 'content-library')
-    config['default-root-sharing-file'] = os.path.abspath( os.path.expanduser( configfile.get('deployment', 'default-root-sharing-file') ) )
 
     # Create a staging directory for content downloaded from S3
     staging_dir = tempfile.mkdtemp()

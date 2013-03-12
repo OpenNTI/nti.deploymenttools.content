@@ -210,7 +210,6 @@ def main():
     config = {}
     config['aws-access-key'] = args.accesskey or configfile.get('authentication', 'aws-access-key')
     config['aws-secret-key'] = args.secretkey or configfile.get('authentication', 'aws-secret-key')
-    config['default-root-sharing-file'] = os.path.abspath( os.path.expanduser( configfile.get('deployment', 'default-root-sharing-file') ) )
     config['environment'] = args.environment or configfile.get('deployment', 'environment')
     config['publication-bucket'] = args.bucket or configfile.get('deployment', 'publication-bucket')
     config['staging-bucket'] = configfile.get('deployment', 'staging-bucket')

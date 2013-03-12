@@ -89,9 +89,6 @@ def main():
     # Build the effective config. This will be important when all of the command line arguments are hooked up.
     config = {}
     config['content-store'] = configfile.get('local', 'content-store')
-    config['aws-access-key'] = configfile.get('authentication', 'aws-access-key')
-    config['aws-secret-key'] = configfile.get('authentication', 'aws-secret-key')
-    config['staging-bucket'] = configfile.get('deployment', 'staging-bucket')
 
     content_list = []
     new_content = render_content( os.path.abspath(content_path) )
