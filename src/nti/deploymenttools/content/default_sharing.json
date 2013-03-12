@@ -1,0 +1,30 @@
+{
+    "prod": {
+        "04630_main": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-msit14_04630",
+	"Great_Leader_Essays": "tag:nextthought.com,2011-10:hitendra-MeetingRoom:Group-mba_2013_01",
+	"MIRANDA_v__ARIZONA_": "tag:nextthought.com,2011-10:sehenderson@ou.edu-MeetingRoom:Group-crimpro_henderson_fall2012",
+	"NEW_YORK_v__QUARLES": "tag:nextthought.com,2011-10:sehenderson@ou.edu-MeetingRoom:Group-crimpro_henderson_fall2012",
+	"CITIZENS_UNITED,_Appellant,_v__FEDERAL_ELECTION_COMMISSION_": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"COHEN_v__CALIFORNIA_": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"Edmund_G__BROWN,_Jr_,_Governor_of_California,_et_al_,_Petitioners,_v__ENTERTAINMENT_MERCHANTS_ASSOCIATION_et_al_": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"FEDERAL_COMMUNICATIONS_COMMISSION_v__PACIFICA_FOUNDATION_ET_AL_": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"NEW_YORK_TIMES_CO__v__SULLIVAN_": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"Wiccan_Headstone_Problem": "tag:nextthought.com,2011-10:thai@post.harvard.edu-MeetingRoom:Group-firstamendment_thai_fall2012",
+	"mathcounts2012": "MATHCOUNTS",
+	"mathcounts2013": "MATHCOUNTS",
+	"MATHCOUNTS_Chapter_Competition2012": "MATHCOUNTS",
+	"MATHCOUNTS_School_Competition2012": "MATHCOUNTS",
+	"MATHCOUNTS_State_Competition2012": "MATHCOUNTS",
+	"testmathcounts2013": "testmathcounts.nextthought.com",
+	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin"
+    },
+    "alpha": {
+	"mathcounts2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
+	"mathcounts2013": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
+	"MATHCOUNTS_Chapter_Competition2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
+	"MATHCOUNTS_School_Competition2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
+	"MATHCOUNTS_State_Competition2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
+	"testmathcounts2013": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0xae82:55736572735f31",
+	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin"
+    }
+}
