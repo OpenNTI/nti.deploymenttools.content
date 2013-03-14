@@ -32,8 +32,8 @@ def render_content( content_path ):
         timestamp = time.strftime('%Y%m%d%H%M%S')
 
         content = { 'name': content_name,
-                    'builder': socket.gethostname().split('.')[0],
-                    'indexer': socket.gethostname().split('.')[0],
+                    'builder': socket.gethostname().split('.')[0].replace('-','_'),
+                    'indexer': socket.gethostname().split('.')[0].replace('-','_'),
                     'version': timestamp,
                     'build_time': timestamp,
                     'index_time': timestamp }
