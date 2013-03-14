@@ -40,7 +40,7 @@ def reindex_content( content, output_dir='.' ):
 
         # Update content metadata and .version file
         timestamp = time.strftime('%Y%m%d%H%M%S')
-        content['indexer'] = socket.gethostname().split('.')[0]
+        content['indexer'] = socket.gethostname().split('.')[0].replace('-','_')
         content['index_time'] = timestamp
         content['version'] = timestamp
 
