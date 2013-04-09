@@ -168,7 +168,7 @@ def publish_content( config ):
         if 'content-store' in config and '.tgz' in config['content-store']:
             inval_keys = upload_content( config, get_content_metadata(config['content-store']) )
         else:
-            content_list = get_content( config, prefix='release' )
+            content_list = get_content( config, prefix=config['content-prefix'] )
             for content in content_list:
                 inval_keys.extend( upload_content( config, content ) )
 
@@ -193,6 +193,10 @@ def _parse_args():
     arg_parser.add_argument( '-b', '--bucket', default='', help="S3 bucket to publish the content to" )
     arg_parser.add_argument( '--environment', default='', 
                              help="Defines which environment settings to use. Valid choices are 'alpha' and 'prod'." )
+    arg_parser.add_argument( '--use-released', dest='pool', action='store_const', const='release', default='release',
+                             help="Forces the retrieval of content from the released pool." )
+    arg_parser.add_argument( '--use-testing', dest='pool', action='store_const', const='testing', default='release',
+                             help="Forces the retrieval of content from the testing pool." )
     arg_parser.add_argument( '-p', '--contentpath', default='',
                              help="Directory containing the content directories" )
     return arg_parser.parse_args()
@@ -214,6 +218,7 @@ def main():
     config['publication-bucket'] = args.bucket or configfile.get('deployment', 'publication-bucket')
     config['staging-bucket'] = configfile.get('deployment', 'staging-bucket')
     config['content-store'] = content_path or configfile.get('local', 'content-store')
+    config['content-prefix'] = args.pool
 
     publish_content( config )
 
