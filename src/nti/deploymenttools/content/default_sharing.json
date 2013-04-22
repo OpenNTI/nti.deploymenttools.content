@@ -16,7 +16,8 @@
 	"MATHCOUNTS_School_Competition2012": "MATHCOUNTS",
 	"MATHCOUNTS_State_Competition2012": "MATHCOUNTS",
 	"testmathcounts2013": "testmathcounts.nextthought.com",
-	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin"
+	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin",
+	"PRMIA_RiskCourse": "prmia.nextthought.com"
     },
     "alpha": {
 	"mathcounts2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
@@ -25,6 +26,7 @@
 	"MATHCOUNTS_School_Competition2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
 	"MATHCOUNTS_State_Competition2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
 	"testmathcounts2013": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0xae82:55736572735f31",
-	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin"
+	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin",
+	"PRMIA_RiskCourse": "prmia.nextthought.com"
     }
 }
