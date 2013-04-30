@@ -110,21 +110,6 @@ def upload_content( config, content ):
         # Make it the current working directory
         os.chdir( working_dir )
 
-        # Unpack the content archive
-        print('Unpacking %s' % content['name'] )
-        with tarfile.open( name=content['archive'] ) as archive:
-            archive.extractall()
-
-        # Add .version file if not present
-        if not os.path.exists( os.path.join(content['name'] , '.version') ):
-            with open( os.path.join(content['name'] , '.version'), 'wb' ) as file:
-                _t = content.pop('archive')
-                json.dump( content, file )
-                content['archive'] = _t
-
-        # Set the default root sharing
-        set_default_root_sharing( content['name'], environment = config['environment'] )
-
         # Connect to S3 and get the keys for the content before we update. This is necessary because we will use 
         # this listing to determine what keys need to be invalidated in CloudFront and CloudFront does not respond 
         # nicely to the request to invalidate non-existant keys.
@@ -136,6 +121,21 @@ def upload_content( config, content ):
         if _is_current( config, s3conn, content ):
             print( '%s, version %s, has already been published.' % (content['name'], content['version']) )
         else:
+            # Unpack the content archive
+            print('Unpacking %s' % content['name'] )
+            with tarfile.open( name=content['archive'] ) as archive:
+                archive.extractall()
+
+            # Add .version file if not present
+            if not os.path.exists( os.path.join(content['name'] , '.version') ):
+                with open( os.path.join(content['name'] , '.version'), 'wb' ) as file:
+                    _t = content.pop('archive')
+                    json.dump( content, file )
+                    content['archive'] = _t
+
+            # Set the default root sharing
+            set_default_root_sharing( content['name'], environment = config['environment'] )
+
             # Send the content to the S3 Prod or Alpha bucket
             _push_content( os.path.abspath(content['name']), access_key=config['aws-access-key'], 
                            secret_key=config['aws-secret-key'], bucket=config['publication-bucket'] )
