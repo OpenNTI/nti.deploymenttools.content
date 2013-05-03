@@ -110,6 +110,9 @@ def upload_content( config, content ):
         # Make it the current working directory
         os.chdir( working_dir )
 
+        # Connect to S3
+        s3conn = boto.connect_s3( config['aws-access-key'], config['aws-secret-key'] )
+
         # Check and see if the content version is not already published. If it is not current, then upload.
         if _is_current( config, s3conn, content ):
             print( '%s, version %s, has already been published.' % (content['name'], content['version']) )
@@ -129,10 +132,9 @@ def upload_content( config, content ):
             # Set the default root sharing
             set_default_root_sharing( content['name'], environment = config['environment'] )
 
-            # Connect to S3 and get the keys for the content before we update. This is necessary because we will use 
+            # Get the keys for the content from S3 before we update. This is necessary because we will use 
             # this listing to determine what keys need to be invalidated in CloudFront and CloudFront does not respond 
             # nicely to the request to invalidate non-existant keys.
-            s3conn = boto.connect_s3( config['aws-access-key'], config['aws-secret-key'] )
             content_keys = []
             content_keys.extend( s3conn.get_bucket( config['publication-bucket'] ).list( prefix=content['name'] ) )
 
