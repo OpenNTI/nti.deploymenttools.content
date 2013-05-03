@@ -19,7 +19,10 @@
 	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin",
 	"PRMIA_RiskCourse": "prmia.nextthought.com",
 	"Columbia_ExecEd_DMS1_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS1.201306",
-	"Columbia_ExecEd_DMS2_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS2.201306"
+	"Columbia_ExecEd_DMS2_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS2.201306",
+	"LitClub_Overview": "litworld.nextthought.com",
+	"LitClub_Reading_List": "litworld.nextthought.com",
+	"LitClub_Unit_1": "litworld.nextthought.com"
     },
     "alpha": {
 	"mathcounts2012": "tag:nextthought.com,2011-10:zope.security.management.system_user-OID-0x276b:5573657273",
@@ -31,6 +34,9 @@
 	"bs242": "tag:nextthought.com,2011-10:barrynschachter@gmail.com-MeetingRoom:Group-basel_otc_margin",
 	"PRMIA_RiskCourse": "prmia.nextthought.com",
 	"Columbia_ExecEd_DMS1_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS1.201306",
-	"Columbia_ExecEd_DMS2_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS2.201306"
+	"Columbia_ExecEd_DMS2_Precourse": "Columbia.ExecEd.DigitalMarketingStrategy.DMS2.201306",
+	"LitClub_Overview": "litworld.nextthought.com",
+	"LitClub_Reading_List": "litworld.nextthought.com",
+	"LitClub_Unit_1": "litworld.nextthought.com"
     }
 }
