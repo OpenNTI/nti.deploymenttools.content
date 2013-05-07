@@ -56,25 +56,29 @@ def _get_content( content_store='.', prefix='testing', title='', version='', all
         filename = os.path.join( content_store, prefix, item )
         # The item is a file and contains .tgz assume it is a content archive.  This is potentially dangerous.
         if os.path.isfile( filename ) and '.tgz' in filename:
-            _t = (os.path.splitext( item )[0]).split('-')
-            if _t[0] in archives:
-                # Check and see if the current item is the newest archive for that content.
-                # If this is the newest, update the tracking list
-                if (archives[_t[0]])['timestamp'] < _t[2]:
-                    (archives[_t[0]])['timestamp'] = _t[2]
-                    (archives[_t[0]])['builder'] = _t[1]
-                    (archives[_t[0]])['filename'] = os.path.abspath(filename)
+            _t = get_content_metadata( filename )
+
+            if title is not '' and title != _t['name']:
+                continue
+
+            if title is not '' and version is not '':
+                if title == _t['name'] and version == _t['version']:
+                    archives[_t['name']] = _t
+                    break
             else:
-                # We have not seen this content before so add it.
-                archives[_t[0]] = {}
-                (archives[_t[0]])['timestamp'] = _t[2]
-                (archives[_t[0]])['builder'] = _t[1]
-                (archives[_t[0]])['filename'] = os.path.abspath(filename)
+                if _t['name'] in archives:
+                    # Check and see if the current item is the newest archive for that content.
+                    # If this is the newest, update the tracking list
+                    if archives[_t['name']]['version'] < _t['version']:
+                        archives[_t['name']] = _t
+                else:
+                    # We have not seen this content before so add it.
+                    archives[_t['name']] = _t
 
     # Build a simple list to return to the caller
     content_list = []
     for archive in archives:
-        content_list.append( get_content_metadata( (archives[archive])['filename'] ) )
+        content_list.append( archives[archive] )
 
     return content_list
 
