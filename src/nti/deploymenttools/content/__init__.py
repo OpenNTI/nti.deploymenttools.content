@@ -42,6 +42,13 @@ def _get_content_metadata_unpacked( content_package ):
 
     return content
 
+def get_published_content_metadata( config, s3conn, content_title ):
+    content = None
+    key = s3conn.get_bucket( config['publication-bucket'] ).get_key( '/'.join( [content_title, '.version'] ) )
+    if key:
+        content = json.loads(key.get_contents_as_string())
+    return content
+
 def _get_content( content_store='.', prefix='testing', title='', version='', all_versions=False ):
     """This method retrieves content from the local filesystem content store. 
     The name variable specifies the desired content title. The version 
