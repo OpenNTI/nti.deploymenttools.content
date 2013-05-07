@@ -36,26 +36,6 @@ def _push_content( content, access_key='', secret_key='',  bucket='' ):
             ]
     subprocess.check_call( cmd )
 
-def _find_old_keys( content_path, content_keys ):
-
-    # Build a list of files in the current content
-    file_list = []
-    content_name = os.path.basename(content_path)
-    for root, dirs, files in os.walk( content_path ):
-        _t = root.split(content_name)
-        # Make path be relative to the root of the content.  That way it will look just like a key name
-        path = content_name.join([''] + _t[1:len(_t)])
-        for name  in files:
-            file_list.append(os.path.join( path, name ) )
-
-    # Compare the list of keys with the list of files and store which keys are not in the list of files.
-    old_keys = []
-    for key in content_keys:
-        if key.name not in file_list:
-            old_keys.append( key )
-
-    return old_keys
-
 def _build_inval_list( keys ):
     keys_inval = []
 
@@ -93,13 +73,6 @@ def _inval_keys( keys_inval, access_key='', secret_key='', bucket='' ):
             inval_req_status = cfconn.invalidation_request_status( distribution_id, inval_req.id ).status
             print( 'Invalidation status: %s Elapsed time: %ss' % (inval_req_status, (time.time()-time_start)) )
 
-def _is_current( config, s3conn, content ):
-    # Check if the .version key exists
-    key = s3conn.get_bucket( config['publication-bucket'] ).get_key( '/'.join( [content['name'], '.version'] ) )
-    if key:
-        published_content = json.loads(key.get_contents_as_string())
-        return content['version'] == published_content['version']
-    return False
 def create_content_delta( config, working_dir, old_content, new_content ):
     """Constructs a directory that contains a only the files add/changed between old_content and new_content and a list of the files in old_content not present in new_content."""
 
