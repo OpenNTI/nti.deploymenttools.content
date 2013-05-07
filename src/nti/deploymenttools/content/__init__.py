@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals, print_function
 
+from hashlib import sha256
+
 import importlib
 import json
 import os
@@ -9,6 +11,52 @@ import shutil
 import subprocess
 import sys
 import tarfile
+
+def compare_files( file_1, file_2 ):
+    """Computes the hashes for file_1 and file_2 and returns if they are equal or not"""
+    # Compute the hash for file 1
+    with open( file_1, 'rb' ) as file:
+        hash_1 = sha256(file.read()).hexdigest()
+    # Compute the hash for file 2
+    with open( file_2, 'rb' ) as file:
+        hash_2 = sha256(file.read()).hexdigest()
+
+    return ( hash_1 == hash_2 )
+
+def create_delta_list( dir_1, dir_2 ):
+    """Assembles the delta between dir_1 and dir_2 and returns the tuple (delta, removed_files). Where 'delta' is the path of the directory containing the files in dir_2 that were added or changed form dir_1 and 'removed_files' is a list of the files in dir_1 not in dir_2."""
+
+    # Traverse and build the list of files in dir_1
+    dir_1_files = []
+    for root, dirs, files in os.walk(dir_1):
+        for file in files:
+            dir_1_files.append(os.path.join(root.replace(dir_1+'/', ''), file))
+
+    # Traverse and build the list of files in dir_2
+    dir_2_files = []
+    for root, dirs, files in os.walk(dir_2):
+        for file in files:
+            dir_2_files.append(os.path.join(root.replace(dir_2+'/', ''), file))
+
+    # First find the files that have changed. Then find the dir_1 files that are not present in dir_2. Finally find the files in the dir_2 that were not present in dir_1.
+    delta_files = []
+    added_files = []
+    removed_files = []
+    for file in dir_1_files:
+        
+        if os.path.exists(os.path.join(dir_2, file)):
+            # If the files are not the same, add the 'new' file to the delta file list
+            if os.path.isfile(file) and not compare_files( os.path.join(dir_1, file), os.path.join( dir_2, file ) ):
+                delta_files.append(file)
+        else:
+            removed_files.append(file)
+
+    for file in dir_2_files:
+        if not os.path.exists(os.path.join(dir_1, file)):
+            delta_files.append( file )
+            added_files.append( file )
+
+    return delta_files, added_files, removed_files
 
 def get_content_metadata( content_package ):
     if '.tgz' in content_package:
