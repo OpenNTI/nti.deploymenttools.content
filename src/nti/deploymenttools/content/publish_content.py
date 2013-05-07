@@ -3,6 +3,8 @@
 from __future__ import unicode_literals, print_function
 
 from . import get_content, set_default_root_sharing
+from . import create_delta_list
+from . import get_published_content_metadata
 
 import boto
 
@@ -11,6 +13,7 @@ import ConfigParser
 import json
 import os
 import shutil
+import stat
 import subprocess
 import tarfile
 import tempfile
@@ -97,6 +100,50 @@ def _is_current( config, s3conn, content ):
         published_content = json.loads(key.get_contents_as_string())
         return content['version'] == published_content['version']
     return False
+def create_content_delta( config, working_dir, old_content, new_content ):
+    """Constructs a directory that contains a only the files add/changed between old_content and new_content and a list of the files in old_content not present in new_content."""
+
+    # Save the current working directory
+    orig_working_dir = os.getcwd()
+
+    # Build directory structure
+    old_dir = os.path.join( working_dir, 'old' )
+    new_dir = os.path.join( working_dir, 'new' )
+    delta_dir = working_dir
+
+    try:
+        os.mkdir(old_dir)
+        os.mkdir(new_dir)
+
+        # Get and unpack the existing content
+        os.chdir(old_dir)
+        old_content = get_content( config, prefix=config['content-prefix'], title=old_content['name'], version=old_content['version'] )[0]
+        with tarfile.open( name=old_content['archive'] ) as archive:
+            archive.extractall()
+
+        # Unpack the new content
+        os.chdir(new_dir)
+        with tarfile.open( name=new_content['archive'] ) as archive:
+            archive.extractall()
+
+        # Create the delta content
+        delta_files, added_files, removed_files = create_delta_list( old_dir, new_dir )
+        for file in delta_files:
+            delta_path = os.path.join( delta_dir,  os.path.dirname(file) )
+            if not os.path.exists( delta_path ):
+                os.makedirs( delta_path )
+            os.link( os.path.join( new_dir, file ), os.path.join( delta_dir, file ) )
+    finally:
+        # Return to the original working directory
+        os.chdir(orig_working_dir)
+
+        # Remove old_dir and new_dir
+        if os.path.exists( old_dir ):
+            shutil.rmtree( old_dir )
+        if os.path.exists( new_dir ):
+            shutil.rmtree( new_dir )
+
+    return added_files, removed_files
 
 def upload_content( config, content ):
     # Save the current working directory
@@ -113,14 +160,24 @@ def upload_content( config, content ):
         # Connect to S3
         s3conn = boto.connect_s3( config['aws-access-key'], config['aws-secret-key'] )
 
+        # Fetch the metadata for the currently published version of the content from S3
+        published_content = get_published_content_metadata( config, s3conn, content['name'] )
+
         # Check and see if the content version is not already published. If it is not current, then upload.
-        if _is_current( config, s3conn, content ):
+        if published_content is not  None and published_content['version'] == content['version']:
             print( '%s, version %s, has already been published.' % (content['name'], content['version']) )
+        elif published_content is not  None and published_content['version'] > content['version']:
+            print( 'A newer version of %s, version %s, has already been published.' % (content['name'], published_content['version']) )
         else:
-            # Unpack the content archive
-            print('Unpacking %s' % content['name'] )
-            with tarfile.open( name=content['archive'] ) as archive:
-                archive.extractall()
+            if published_content is None:
+                # Unpack the content archive
+                print('Unpacking %s' % content['name'] )
+                with tarfile.open( name=content['archive'] ) as archive:
+                    archive.extractall()
+                removed_files = []
+            else:
+                print('Calculating the delta between %s version %s and %s.' % (content['name'], published_content['version'], content['version']) )
+                added_files, removed_files = create_content_delta( config, working_dir, published_content, content )
 
             # Add .version file if not present
             if not os.path.exists( os.path.join(content['name'] , '.version') ):
@@ -129,8 +186,10 @@ def upload_content( config, content ):
                     json.dump( content, file )
                     content['archive'] = _t
 
-            # Set the default root sharing
-            set_default_root_sharing( content['name'], environment = config['environment'] )
+            # Only set default sharing if the 'eclipse-toc.xml' file exists.  The only time it would not
+            # exist is for content updates where the toc does not change.
+            if os.path.exists( os.path.join(content['name'] , 'eclipse-toc.xml' ) ):
+                set_default_root_sharing( content['name'], environment = config['environment'] )
 
             # Get the keys for the content from S3 before we update. This is necessary because we will use 
             # this listing to determine what keys need to be invalidated in CloudFront and CloudFront does not respond 
@@ -145,14 +204,11 @@ def upload_content( config, content ):
             # Build the list of keys to be invalidated for this content
             inval_keys = _build_inval_list( content_keys )
 
-            # Find keys leftover from previous versions of the content
-            old_keys = _find_old_keys( os.path.abspath(content['name']), content_keys )
-
-            # Delete the old keys
-            for key in old_keys:
-                print( 'Deleting leftover key: %s' % key.name )
-                key.delete()
-
+            # Find keys leftover from previous versions of the content and delete them
+            for key in content_keys:
+                if key.name in removed_files:
+                    print( 'Deleting leftover key: %s' % key.name )
+                    key.delete()
     finally:
         # Clean-up
         os.chdir( orig_working_dir )
