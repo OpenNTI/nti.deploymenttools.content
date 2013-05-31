@@ -144,6 +144,8 @@ def get_content( config=None, prefix='testing', title='', version='', all_versio
     if not config:
         raise Exception("Must pass a config object")
 
+    print('Determining the latest content. This may take a (really) long time.')
+
     # Get content from the local store
     content_list = _get_content( config['content-store'], prefix, title, version, all_versions )
 
