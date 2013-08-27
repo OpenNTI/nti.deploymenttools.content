@@ -2,7 +2,10 @@
 
 from __future__ import unicode_literals, print_function
 
-from . import get_content_metadata, symlink_content
+from . import get_content_metadata
+from . import get_from_catalog
+from . import symlink_content
+from . import update_catalog
 
 import argparse
 import ConfigParser
@@ -10,7 +13,13 @@ import os
 
 def mark_for_release( config, content ):
     print( 'Marking %s version %s for release.' % ( content['name'], content['version'] ) )
-    symlink_content( config, content, 'release' )
+    entry = get_from_catalog(config['content-store'], title=content['name'], version=content['version'])
+    if entry:
+        symlink_content( config, content, 'release' )
+        entry[0]['state'].append('release')
+        update_catalog(config['content-store'], entry)
+    else:
+        print('Unable to find %s, version %s, in the catalog' % ( content['name'], content['version'] ) )
 
 DEFAULT_CONFIG_FILE='~/etc/nti_util_conf.ini'
 
