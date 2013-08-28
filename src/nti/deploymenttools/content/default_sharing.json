@@ -1,6 +1,7 @@
 {
 	"prod": {
 		"04630_main": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-msit14_04630",
+		"04630_Course_Fall2013": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-cspe2013_schmidtke_8bd7eb7a_f950_40fe_6550_e88635f6050f",
 		"Great_Leader_Essays": "tag:nextthought.com,2011-10:hitendra-MeetingRoom:Group-mba_2013_01",
 		"MIRANDA_v__ARIZONA_": "tag:nextthought.com,2011-10:sehenderson@ou.edu-MeetingRoom:Group-crimpro_henderson_fall2012",
 		"NEW_YORK_v__QUARLES": "tag:nextthought.com,2011-10:sehenderson@ou.edu-MeetingRoom:Group-crimpro_henderson_fall2012",
@@ -27,6 +28,7 @@
 		"Otis_McDONALD,_et_al_,_Petitioners,_v__CITY_OF_CHICAGO,_ILLINOIS,_et_al_": "oudemo.nextthought.com"
 	},
 	"alpha": {
+		"04630_Course_Fall2013": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-cspe2013_schmidtke_8bd7eb7a_f950_40fe_6550_e88635f6050f",
 		"mathcounts2012": "MathCounts",
 		"mathcounts2013": "MathCounts",
 		"MATHCOUNTS_Chapter_Competition2012": "MathCounts",
