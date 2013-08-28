@@ -160,32 +160,41 @@ def _is_valid_file_or_link( filename ):
     return ((os.path.isfile(filename) and not os.path.islink(filename)) or (os.path.islink(filename) and os.path.exists(os.path.join(os.path.dirname(filename), os.readlink(filename)))))
 
 def _build_catalog(conn, content_store):
+    logger.info('Building catalog')
     catalog = {}
     for root, dirs, files in os.walk(content_store):
         for file in files:
             content_file = os.path.join(root,file)
             if _is_content_package(content_file) and _is_valid_file_or_link(content_file):
                 logger.debug('Processesing %s' % (file,))
-                state = os.path.split(root)[1]
-                record = get_content_metadata( os.path.join( root, file ))
+                state = os.path.basename(root)
                 if os.path.islink(content_file):
                     linkpath = os.readlink(content_file)
                     if not os.path.isabs(linkpath):
                         linkpath = os.path.normpath(os.path.join(os.path.dirname(content_file), linkpath))
-                    record['archive'] = os.path.relpath(linkpath, content_store)
+                    content_file = linkpath
+
+                records = get_from_catalog(content_store, archive=os.path.relpath(content_file, content_store))
+                if records:
+                    logger.debug('Using existing record for %s' % (os.path.relpath(content_file, content_store),))
+                    record = records[0]
                 else:
+                    record = get_content_metadata( content_file )
                     record['archive'] = os.path.relpath(content_file, content_store)
-                record['state'] = []
+                    record['state'] = []
+
                 key = '-'.join([record['name'], record['version']])
                 if key not in catalog.keys():
                     catalog[key] = record
-                catalog[key]['state'].append(state)
+                elif state not in catalog[key]['state']:
+                    catalog[key]['state'].append(state)
 
     _write_catalog(conn, catalog)
 
     return catalog
 
 def _clean_catalog(conn, content_store):
+    logger.info('Cleaning catalog')
     catalog = _read_catalog( conn )
     
     for entry in catalog.values():
@@ -240,7 +249,7 @@ def get_catalog( content_store ):
 
     return catalog
 
-def get_from_catalog( content_store, title='', version='' ):
+def get_from_catalog( content_store, title='', version='', archive='' ):
     conn, existing = _open_catalog( content_store )
 
     if not existing:
@@ -253,6 +262,8 @@ def get_from_catalog( content_store, title='', version='' ):
         cursor.execute('SELECT name, version, builder, build_time, indexer, index_time, archive, _rowid_  FROM records WHERE version=?', (version,))
     elif title:
         cursor.execute('SELECT name, version, builder, build_time, indexer, index_time, archive, _rowid_  FROM records WHERE name=?', (title,))
+    elif archive:
+        cursor.execute('SELECT name, version, builder, build_time, indexer, index_time, archive, _rowid_  FROM records WHERE archive=?', (archive,))
 
     catalog = []
     records = cursor.fetchall()

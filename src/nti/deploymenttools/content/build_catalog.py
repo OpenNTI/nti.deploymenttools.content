@@ -49,7 +49,6 @@ def main():
         print('Building the catalog for %s' % (config['content-store'],))
 
     if existing:
-        print('Cleaning exising catalog prior to rebuilding it.')
         _clean_catalog(conn, config['content-store'])
 
     _build_catalog(conn, config['content-store'])
