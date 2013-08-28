@@ -32,6 +32,10 @@ def update_content( config, content ):
             # The content has already been updated, do not repeat
             print( '%s is already up to date.' % content['name'] )
             return
+        else:
+            print('Updating %s from version %s to %s' % (content['name'], existing_content['version'], content['version']))
+    else:
+        print('No version file found. Updating %s' % content['name'])
 
     # Create a temporary working directory
     working_dir = tempfile.mkdtemp()
