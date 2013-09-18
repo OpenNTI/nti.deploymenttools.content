@@ -318,7 +318,8 @@ def update_catalog( content_store, content_list):
         cursor.execute('SELECT COUNT(*) FROM records WHERE name=? AND version=?', (entry['name'], int(entry['version'])))
         if int(cursor.fetchone()[0]) == 0:
             logger.info('Adding %s, version %s, to the database.' % (entry['name'], entry['version']))
-            cursor.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?)', (entry['name'], int(entry['version']), entry['builder'], int(entry['build_time']), entry['indexer'], int(entry['index_time']), entry['archive']))
+            archive = os.path.relpath(entry['archive'], content_store)
+            cursor.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?)', (entry['name'], int(entry['version']), entry['builder'], int(entry['build_time']), entry['indexer'], int(entry['index_time']), archive))
         else:
             logger.info('%s, version %s, is already in the database.' % (entry['name'], entry['version']))
 
