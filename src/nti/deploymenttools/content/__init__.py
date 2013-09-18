@@ -186,7 +186,9 @@ def _build_catalog(conn, content_store):
                 key = '-'.join([record['name'], record['version']])
                 if key not in catalog.keys():
                     catalog[key] = record
-                elif state not in catalog[key]['state']:
+
+                if state not in catalog[key]['state']:
+                    logger.debug('Adding state: %s' % state)
                     catalog[key]['state'].append(state)
 
     _write_catalog(conn, catalog)
