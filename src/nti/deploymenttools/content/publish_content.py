@@ -46,6 +46,8 @@ def _build_inval_list( keys ):
             keys_inval.append( '/' + key.name )
         elif 'css' in key.name:
             keys_inval.append( '/' + key.name )
+        elif 'video_index' in key.name:
+            keys_inval.append( '/' + key.name )
 
     return keys_inval
 
