@@ -58,13 +58,5 @@
 		"METR2603_SevereWeather": "tag:nextthought.com,2011-10:post8922-MeetingRoom:Group-metr2603fall2013.ou.nextthought.com",
 		"PHIL1203_HumanDestiny": "tag:nextthought.com,2011-10:judi5807-MeetingRoom:Group-phil1203fall2013.ou.nextthought.com",
 		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com"
-	},
-	"ou": {
-		"CHEM1315_GeneralChemistry": "CHEM1315Fall2013.ou.nextthought.com",
-		"CLC3403_LawAndJustice": "tag:nextthought.com,2011-10:harp4162-MeetingRoom:Group-clc3403fall2013.ou.nextthought.com",
-		"IAS2003_GlobalCommunity": "tag:nextthought.com,2011-10:gril4990-MeetingRoom:Group-ias2003fall2013.ou.nextthought.com",
-		"METR2603_SevereWeather": "tag:nextthought.com,2011-10:post8922-MeetingRoom:Group-metr2603fall2013.ou.nextthought.com",
-		"PHIL1203_HumanDestiny": "tag:nextthought.com,2011-10:judi5807-MeetingRoom:Group-phil1203fall2013.ou.nextthought.com",
-		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com"
 	}
 }
