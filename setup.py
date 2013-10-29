@@ -8,6 +8,7 @@ entry_points = {
 		'render_content = nti.deploymenttools.content.render:main',
 		'release_content = nti.deploymenttools.content.release_content:main',
 		'update_content = nti.deploymenttools.content.update_content:main',
+		'update_default_sharing = nti.deploymenttools.content.update_default_sharing:main',
 		'build_content_catalog = nti.deploymenttools.content.build_catalog:main',
 	]
 }
