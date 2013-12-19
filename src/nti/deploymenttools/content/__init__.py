@@ -212,7 +212,7 @@ def _clean_catalog(conn, content_store):
                 else:
                     logger.warning('%s missing for %s. Removing.' % (state, file))
                     entry['state'].remove(state)
-                    update_catalog(conn, [entry])
+                    update_catalog(content_store, [entry])
 
         else:
             logger.warn('%s is missing. We should remove this from the catalog' % (os.path.join(content_store, entry['archive']),))
