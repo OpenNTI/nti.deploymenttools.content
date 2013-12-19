@@ -83,10 +83,14 @@ def _parse_args():
                              help="Defines which environment settings to use. Valid choices are 'alpha' and 'prod'." )
     arg_parser.add_argument( '-p', '--contentpath', default='', 
                              help="A content archive or a directory containing content archives" )
+    arg_parser.add_argument( '--use-dev', dest='pool', action='store_const', const='development', default='testing',
+                             help="Forces the retrieval of content from the development pool." )
     arg_parser.add_argument( '--use-released', dest='pool', action='store_const', const='release', default='testing',
                              help="Forces the retrieval of content from the released pool." )
     arg_parser.add_argument( '--use-testing', dest='pool', action='store_const', const='testing', default='testing',
                              help="Forces the retrieval of content from the testing pool." )
+    arg_parser.add_argument( '--use-uat', dest='pool', action='store_const', const='uat', default='testing',
+                             help="Forces the retrieval of content from the UAT pool." )
     return arg_parser.parse_args()
 
 def main():
