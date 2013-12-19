@@ -11,12 +11,12 @@ import argparse
 import ConfigParser
 import os
 
-def mark_for_release( config, content ):
+def mark_for_release( config, content, dest='release' ):
     print( 'Marking %s version %s for release.' % ( content['name'], content['version'] ) )
     entry = get_from_catalog(config['content-store'], title=content['name'], version=content['version'])
     if entry:
-        symlink_content( config, content, 'release' )
-        entry[0]['state'].append('release')
+        symlink_content( config, content, dest )
+        entry[0]['state'].append(dest)
         update_catalog(config['content-store'], entry)
     else:
         print('Unable to find %s, version %s, in the catalog' % ( content['name'], content['version'] ) )
@@ -34,6 +34,10 @@ def _parse_args():
                              help="Content archive to release" )
     arg_parser.add_argument( '-p', '--contentpath',
                              help="The unpacked content to release" )
+    arg_parser.add_argument( '--use-release', dest='pool', action='store_const', const='release', default='release',
+                             help="Release the content to the release pool." )
+    arg_parser.add_argument( '--use-uat', dest='pool', action='store_const', const='uat', default='release',
+                             help="Release the content to the UAT pool." )
     return arg_parser.parse_args()
 
 def main():
@@ -57,10 +61,10 @@ def main():
     config['content-store'] = content_path or configfile.get('local', 'content-store')
 
     if content_archive and '.tgz' in content_archive:
-        mark_for_release( config, get_content_metadata(content_archive) )
+        mark_for_release( config, get_content_metadata(content_archive), dest=args.pool )
     elif content_path and os.path.isdir(content_path):
         if os.path.exists( os.path.join( content_path, '.version' ) ):
-            mark_for_release( config, get_content_metadata(content_path) )
+            mark_for_release( config, get_content_metadata(content_path), dest=args.pool )
         else:
             print( '%s does not contain valid content' % content_path )
     else:

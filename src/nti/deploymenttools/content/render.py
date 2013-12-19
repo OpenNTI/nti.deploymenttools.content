@@ -75,6 +75,10 @@ def _parse_args():
     arg_parser.add_argument( 'contentpath', help="Directory containing the content" )
     arg_parser.add_argument( '-c', '--config', default=DEFAULT_CONFIG_FILE, 
                              help="Configuration file. The default is: %s" % DEFAULT_CONFIG_FILE )
+    arg_parser.add_argument( '--use-testing', dest='pool', action='store_const', const='testing', default='testing',
+                             help="Add the rendered content to the testing pool." )
+    arg_parser.add_argument( '--use-dev', dest='pool', action='store_const', const='development', default='testing',
+                             help="Add the rendered content to the development pool." )
     return arg_parser.parse_args()
 
 def main():
@@ -95,7 +99,7 @@ def main():
     if new_content:
         content_list.append(new_content)
 
-    put_content( config, content_list )
+    put_content( config, content_list, dest=args.pool )
 
 if __name__ == '__main__': # pragma: no cover
         main()
