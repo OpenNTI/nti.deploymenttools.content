@@ -32,7 +32,21 @@
 		"IAS2003_GlobalCommunity": "tag:nextthought.com,2011-10:gril4990-MeetingRoom:Group-ias2003fall2013.ou.nextthought.com",
 		"METR2603_SevereWeather": "tag:nextthought.com,2011-10:post8922-MeetingRoom:Group-metr2603fall2013.ou.nextthought.com",
 		"PHIL1203_HumanDestiny": "tag:nextthought.com,2011-10:judi5807-MeetingRoom:Group-phil1203fall2013.ou.nextthought.com",
-		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com"
+		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com",
+		"ANTH1613_Native_Peoples_of_Oklahoma": "tag:nextthought.com,2011-10:swan3561-MeetingRoom:Group-anth1613spring2014.ou.nextthought.com",
+		"ANTH4970_Practical_Importance_of_Human_Evolution": "tag:nextthought.com,2011-10:lewi7532-MeetingRoom:Group-anth4970spring2014.ou.nextthought.com",
+		"CHEM4970_Chemistry_of_Beer": "tag:nextthought.com,2011-10:morv1533-MeetingRoom:Group-chem4970spring2014.ou.nextthought.com",
+		"COMM4970_Understanding_and_Detecting_Deception": "tag:nextthought.com,2011-10:dunb8859-MeetingRoom:Group-comm4970spring2014.ou.nextthought.com",
+		"CS1300_Power_and_Elegance_of_Computational_Thinking": "tag:nextthought.com,2011-10:mcgo2121-MeetingRoom:Group-cs1300spring2014.ou.nextthought.com",
+		"CS1323_Intro_to_Computer_Programming": "tag:nextthought.com,2011-10:tryt3968-MeetingRoom:Group-cs1323spring2014.ou.nextthought.com",
+		"EDAH5023_Admin_of_Adult_and_Higher_Education": "tag:nextthought.com,2011-10:blac9783-MeetingRoom:Group-edah5023spring2014.ou.nextthought.com",
+		"ENGR1510_Intro_to_Water": "tag:nextthought.com,2011-10:saba3508-MeetingRoom:Group-engr1510spring2014.ou.nextthought.com",
+		"FIN3303_Business_Finance": "tag:nextthought.com,2011-10:megg4758-MeetingRoom:Group-fin3303spring2014.ou.nextthought.com",
+		"GEOG3890_Hydraulic_Fracturing_and_Water_Resources": "tag:nextthought.com,2011-10:puls2013-MeetingRoom:Group-geog3890spring2014.ou.nextthought.com",
+		"GEOL1114_Physical_Geology": "tag:nextthought.com,2011-10:elmo3302-MeetingRoom:Group-geol1114spring2014.ou.nextthought.com",
+		"HSCI3013_History_of_Science": "tag:nextthought.com,2011-10:magr9201-MeetingRoom:Group-hsci3013spring2014.ou.nextthought.com",
+		"PSC4283_Civil_Rights_and_Civil_Liberties": "tag:nextthought.com,2011-10:wert4649-MeetingRoom:Group-psc4283spring2014.ou.nextthought.com",
+		"SOC1113_Intro_to_Sociology": "tag:nextthought.com,2011-10:damp8528-MeetingRoom:Group-soc1113spring2014.ou.nextthought.com"
 	},
 	"alpha": {
 		"04630_Course_Fall2013": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-cspe2013_schmidtke_8bd7eb7a_f950_40fe_6550_e88635f6050f",
@@ -57,6 +71,20 @@
 		"IAS2003_GlobalCommunity": "tag:nextthought.com,2011-10:gril4990-MeetingRoom:Group-ias2003fall2013.ou.nextthought.com",
 		"METR2603_SevereWeather": "tag:nextthought.com,2011-10:post8922-MeetingRoom:Group-metr2603fall2013.ou.nextthought.com",
 		"PHIL1203_HumanDestiny": "tag:nextthought.com,2011-10:judi5807-MeetingRoom:Group-phil1203fall2013.ou.nextthought.com",
-		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com"
+		"SOC3123_SocialStatistics": "tag:nextthought.com,2011-10:peck6569-MeetingRoom:Group-soc3123fall2013.ou.nextthought.com",
+		"ANTH1613_Native_Peoples_of_Oklahoma": "tag:nextthought.com,2011-10:swan3561-MeetingRoom:Group-anth1613spring2014.ou.nextthought.com",
+		"ANTH4970_Practical_Importance_of_Human_Evolution": "tag:nextthought.com,2011-10:lewi7532-MeetingRoom:Group-anth4970spring2014.ou.nextthought.com",
+		"CHEM4970_Chemistry_of_Beer": "tag:nextthought.com,2011-10:morv1533-MeetingRoom:Group-chem4970spring2014.ou.nextthought.com",
+		"COMM4970_Understanding_and_Detecting_Deception": "tag:nextthought.com,2011-10:dunb8859-MeetingRoom:Group-comm4970spring2014.ou.nextthought.com",
+		"CS1300_Power_and_Elegance_of_Computational_Thinking": "tag:nextthought.com,2011-10:mcgo2121-MeetingRoom:Group-cs1300spring2014.ou.nextthought.com",
+		"CS1323_Intro_to_Computer_Programming": "tag:nextthought.com,2011-10:tryt3968-MeetingRoom:Group-cs1323spring2014.ou.nextthought.com",
+		"EDAH5023_Admin_of_Adult_and_Higher_Education": "tag:nextthought.com,2011-10:blac9783-MeetingRoom:Group-edah5023spring2014.ou.nextthought.com",
+		"ENGR1510_Intro_to_Water": "tag:nextthought.com,2011-10:saba3508-MeetingRoom:Group-engr1510spring2014.ou.nextthought.com",
+		"FIN3303_Business_Finance": "tag:nextthought.com,2011-10:megg4758-MeetingRoom:Group-fin3303spring2014.ou.nextthought.com",
+		"GEOG3890_Hydraulic_Fracturing_and_Water_Resources": "tag:nextthought.com,2011-10:puls2013-MeetingRoom:Group-geog3890spring2014.ou.nextthought.com",
+		"GEOL1114_Physical_Geology": "tag:nextthought.com,2011-10:elmo3302-MeetingRoom:Group-geol1114spring2014.ou.nextthought.com",
+		"HSCI3013_History_of_Science": "tag:nextthought.com,2011-10:magr9201-MeetingRoom:Group-hsci3013spring2014.ou.nextthought.com",
+		"PSC4283_Civil_Rights_and_Civil_Liberties": "tag:nextthought.com,2011-10:wert4649-MeetingRoom:Group-psc4283spring2014.ou.nextthought.com",
+		"SOC1113_Intro_to_Sociology": "tag:nextthought.com,2011-10:damp8528-MeetingRoom:Group-soc1113spring2014.ou.nextthought.com"
 	}
 }
