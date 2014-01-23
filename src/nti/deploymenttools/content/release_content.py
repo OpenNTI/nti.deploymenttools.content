@@ -15,7 +15,7 @@ def mark_for_release( config, content, dest='release' ):
     print( 'Marking %s version %s for release.' % ( content['name'], content['version'] ) )
     entry = get_from_catalog(config['content-store'], title=content['name'], version=content['version'])
     if entry:
-        symlink_content( config, content, dest )
+        symlink_content( config, entry[0], dest )
         entry[0]['state'].append(dest)
         update_catalog(config['content-store'], entry)
     else:
@@ -58,7 +58,7 @@ def main():
 
     # Build the effective config
     config = {}
-    config['content-store'] = content_path or configfile.get('local', 'content-store')
+    config['content-store'] = configfile.get('local', 'content-store')
 
     if content_archive and '.tgz' in content_archive:
         mark_for_release( config, get_content_metadata(content_archive), dest=args.pool )
