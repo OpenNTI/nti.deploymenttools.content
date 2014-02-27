@@ -14,6 +14,8 @@ import sys
 import tarfile
 import tempfile
 
+from functools import partial
+from multiprocessing import Pool
 
 def update_content( config, content ):
     content_dir = os.path.join( config['content-library'], content['name'] )
@@ -77,6 +79,8 @@ def _parse_args():
     arg_parser = argparse.ArgumentParser( description="Content Updater" )
     arg_parser.add_argument( '-c', '--config', default=DEFAULT_CONFIG_FILE,
                              help="Configuration file. The default is: %s" % DEFAULT_CONFIG_FILE )
+    arg_parser.add_argument( '-j', dest='process_pool_size', type=int, default='4', 
+                             help="Number of processes used when updating content. The default is four." )
     arg_parser.add_argument( '-l', '--content-library', dest='content_library', default='', 
                              help="Path from which the content is served from" )
     arg_parser.add_argument( '--environment', default='', 
@@ -115,8 +119,11 @@ def main():
             update_content( config, get_content_metadata(content_path) )
         else:
             latest_content = get_content( config=config, prefix=args.pool )
-            for content in latest_content:
-                update_content( config, content )
+            process_pool = Pool(processes=args.process_pool_size)
+            partial_update_content = partial(update_content, config)
+            process_pool.map_async(partial_update_content, latest_content)
+            process_pool.close()
+            process_pool.join()
     finally:
         if os.path.exists( staging_dir ):
             shutil.rmtree( staging_dir )
