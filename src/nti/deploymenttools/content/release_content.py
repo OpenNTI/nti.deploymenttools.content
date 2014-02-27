@@ -12,7 +12,7 @@ import ConfigParser
 import os
 
 def mark_for_release( config, content, dest='release' ):
-    print( 'Marking %s version %s for release.' % ( content['name'], content['version'] ) )
+    print( 'Marking %s version %s for %s.' % ( content['name'], content['version'], dest ) )
     entry = get_from_catalog(config['content-store'], title=content['name'], version=content['version'])
     if entry:
         symlink_content( config, entry[0], dest )
