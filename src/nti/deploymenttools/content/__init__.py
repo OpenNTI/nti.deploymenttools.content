@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals, print_function
 
+from datetime import datetime
+from datetime import timedelta
 from hashlib import sha256
 
 import importlib
@@ -195,6 +197,15 @@ def _build_catalog(conn, content_store):
 
     return catalog
 
+def _remove_catalog_entry(conn, content):
+    cursor = conn.cursor()
+    cursor.execute('SELECT _rowid_ FROM records WHERE name=? and version=?', (content['name'], int(content['version'])))
+    row_id = cursor.fetchone()[0]
+    for state in content['state']:
+        cursor.execute('DELETE FROM state WHERE recordId=?', (row_id,))
+    cursor.execute('DELETE FROM records WHERE _rowid_=?', (row_id,))
+    conn.commit()
+
 def _clean_catalog(conn, content_store):
     logger.info('Cleaning catalog')
     catalog = _read_catalog( conn )
@@ -224,6 +235,51 @@ def _clean_catalog(conn, content_store):
             cursor.execute('DELETE FROM records WHERE _rowid_=?', (row_id,))
             conn.commit()
 
+def gc_catalog( content_store ):
+    logger.info('Garbage collecting the catalog')
+
+    def _get_gc_candidates( content_store ):
+        conn, existing = _open_catalog( content_store )
+
+        if not existing:
+            _build_catalog(conn, content_store)
+
+        cursor = conn.cursor()
+
+        # Fetch the records
+        cursor.execute('SELECT a.recordId FROM (SELECT recordId, count(recordId) AS num FROM state GROUP BY recordId) AS a JOIN  state ON (a.recordId = state.recordId) WHERE num = 1 AND state = ?', ('testing',))
+
+        gc_candidates = []
+        results = cursor.fetchall()
+        for result in results:
+            entry = _get_record_by_id(conn, content_store, result[0])
+            gc_candidates.append(entry)
+        conn.close()
+        return gc_candidates
+
+    gc_candidates =  _get_gc_candidates( content_store )
+    latest_content = get_latest_from_catalog( content_store, category='testing' )
+
+    # Pruning the latest version of each content item from the pool
+    for candidate in gc_candidates:
+        for latest in latest_content:
+            if candidate == latest:
+                logger.debug('Removing latest %s from candidate GC pool' % (candidate['name'] ,))
+                gc_candidates.remove(candidate)
+
+    # Pruning content that is less than 2 days old from the pool
+    threshold = (datetime.now() - timedelta(days=2)).strftime('%Y%m%d')
+    for candidate in gc_candidates:
+        if candidate['build_time'] > threshold:
+            logger.debug('Removing %s version %s from candidate GC pool' % (candidate['name'], candidate['version']))
+            gc_candidates.remove(candidate)
+
+    # Garbage collect the content packages in the pool
+    gc_count = len(gc_candidates)
+    logger.info('Garbage collecting %d content packages' % (gc_count, ))
+    for candidate in gc_candidates:
+        remove_content( content_store, candidate)
+
 def _open_catalog( content_store ):
     if _is_content_package(content_store):
         logger.warn('The content-store is a content package.')
@@ -250,6 +306,21 @@ def get_catalog( content_store ):
         catalog = _build_catalog(conn, content_store)
 
     return catalog
+
+def _get_record_by_id(conn, content_store, record_id):
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, version, builder, build_time, indexer, index_time, archive, _rowid_  FROM records WHERE _rowid_=?', (record_id,))
+
+    entry = None
+    records = cursor.fetchall()
+    for record in records:
+        entry = {'name': record[0], 'version': unicode(record[1]), 'builder': record[2], 'build_time': unicode(record[3]), 'indexer': record[4], 'index_time': unicode(record[5]), 'archive': record[6], 'state': []}
+        entry['archive'] = os.path.join(content_store, entry['archive'])
+        cursor.execute('SELECT state FROM state WHERE recordId=?', (record[7],))
+        states = cursor.fetchall()
+        for state in states:
+            entry['state'].append(state[0])
+    return entry
 
 def get_from_catalog( content_store, title='', version='', archive='' ):
     conn, existing = _open_catalog( content_store )
@@ -405,6 +476,22 @@ def put_content( config, content_list=None, dest='testing' ):
                 content['state'] = []
             content['state'].append(dest);
     update_catalog(config['content-store'], content_list)
+
+def remove_content( content_store, content ):
+    conn, existing = _open_catalog( content_store )
+
+    if not existing:
+        _build_catalog(conn, content_store)
+
+    logger.info('Removing %s version %s.' % (content['name'], content['version']))
+    # First remove the catalog entry
+    _remove_catalog_entry(conn, content)
+
+    # then remove the archive file and symlinks
+    for state in content['state']:
+        content_path = os.path.join(content_store,state, os.path.basename(content['archive']))
+        if os.path.exists( content_path ):
+            os.remove( content_path )
 
 def set_default_root_sharing( content, environment = 'prod' ):
     filename = os.path.join( os.path.dirname( __file__ ), 'default_sharing.json' )
