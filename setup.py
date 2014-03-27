@@ -10,6 +10,7 @@ entry_points = {
 		'update_content = nti.deploymenttools.content.update_content:main',
 		'update_default_sharing = nti.deploymenttools.content.update_default_sharing:main',
 		'build_content_catalog = nti.deploymenttools.content.build_catalog:main',
+		'gc_content_catalog = nti.deploymenttools.content.gc_catalog:main',
 	]
 }
 
