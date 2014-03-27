@@ -261,19 +261,29 @@ def gc_catalog( content_store ):
     latest_content = get_latest_from_catalog( content_store, category='testing' )
 
     # Pruning the latest version of each content item from the pool
+    pruned_list = []
     for candidate in gc_candidates:
         for latest in latest_content:
             if candidate['name'] == latest['name'] and candidate['version'] == latest['version']:
-                logger.debug('Removing latest %s from candidate GC pool' % (candidate['name'] ,))
-                gc_candidates.remove(candidate)
+                logger.debug('Removing latest %s, version %s, from candidate GC pool' % (candidate['name'], candidate['version']))
+                pruned_list.append(candidate)
+
+    # Remove pruned entries
+    for item in pruned_list:
+        gc_candidates.remove(item)
+    pruned_list = []
 
     # Pruning content that is less than 2 days old from the pool
     threshold = int((datetime.now() - timedelta(days=2)).strftime('%Y%m%d%H%m'))
-    print(threshold)
     for candidate in gc_candidates:
         if int(candidate['build_time']) > threshold:
             logger.debug('Removing %s version %s from candidate GC pool' % (candidate['name'], candidate['version']))
-            gc_candidates.remove(candidate)
+            pruned_list.append(candidate)
+
+    # Remove pruned entries
+    for item in pruned_list:
+        gc_candidates.remove(item)
+    pruned_list = []
 
     # Garbage collect the content packages in the pool
     gc_count = len(gc_candidates)
