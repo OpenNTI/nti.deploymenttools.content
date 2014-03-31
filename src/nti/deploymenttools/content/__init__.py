@@ -274,7 +274,7 @@ def gc_catalog( content_store ):
     pruned_list = []
 
     # Pruning content that is less than 2 days old from the pool
-    threshold = int((datetime.now() - timedelta(days=2)).strftime('%Y%m%d%H%m'))
+    threshold = int((datetime.now() - timedelta(days=2)).strftime('%Y%m%d%H%m%S'))
     for candidate in gc_candidates:
         if int(candidate['build_time']) > threshold:
             logger.debug('Removing %s version %s from candidate GC pool' % (candidate['name'], candidate['version']))
