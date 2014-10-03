@@ -44,9 +44,9 @@ def main():
 
     conn, existing = _open_catalog(config['content-store'])
     if existing:
-        print('Rebuilding the catalog for %s' % (config['content-store'],))
+        logger.info('Rebuilding the catalog for %s' % (config['content-store'],))
     else:
-        print('Building the catalog for %s' % (config['content-store'],))
+        logger.info('Building the catalog for %s' % (config['content-store'],))
 
     if existing:
         _clean_catalog(conn, config['content-store'])
