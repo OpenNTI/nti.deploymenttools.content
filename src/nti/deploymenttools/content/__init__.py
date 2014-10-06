@@ -17,6 +17,8 @@ import tarfile
 
 import logging
 
+from xml.dom.minidom import parse as xmlparse
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -504,15 +506,27 @@ def remove_content( content_store, content ):
         if os.path.exists( content_path ):
             os.remove( content_path )
 
-def set_default_root_sharing( content, environment = 'prod' ):
+def _legacy_default_root_sharing_lookup( content, environment= 'prod' ):
     filename = os.path.join( os.path.dirname( __file__ ), 'default_sharing.json' )
     with open( filename, 'rb' ) as file:
         default_root_sharing = json.load( file )[environment]
 
+    sharedWith = None
     if os.path.basename(content) in default_root_sharing:
-        print( 'Setting default root sharing group on %s' % os.path.basename(content) )
-        cmd = [ 'nti_default_root_sharing_setter',
-                content,
-                '-g', default_root_sharing[os.path.basename(content)]
-                ]
-        subprocess.check_call( cmd )
+        sharedWith = default_root_sharing[os.path.basename(content)]
+
+    return sharedWith
+
+def set_default_root_sharing( content, environment = 'prod', sharedWith=None ):
+    if sharedWith is None:
+        sharedWith = _legacy_default_root_sharing_lookup(content, environment)
+
+    if sharedWith is not None:
+        logger.info( 'Setting default root sharing group on %s to %s' % (os.path.basename(content), sharedWith) )
+        toc_name = 'eclipse-toc.xml'
+        toc = xmlparse(os.path.join(content, toc_name))
+        toc_node = toc.getElementsByTagName('toc')[0]
+        toc_node.setAttribute('sharedWith', sharedWith)
+
+        with open( os.path.join(content, toc_name), 'wb' ) as file:
+            file.write(toc.toxml('utf-8'))
