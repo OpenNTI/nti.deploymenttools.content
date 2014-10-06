@@ -17,7 +17,7 @@ import tempfile
 from functools import partial
 from multiprocessing import Pool
 
-def update_content( config, content ):
+def update_content( config, content , sharedWith=None ):
     content_dir = os.path.join( config['content-library'], content['name'] )
 
     # If the content directory does not exist, then create it.
@@ -60,8 +60,7 @@ def update_content( config, content ):
                 content['archive'] = _t
 
         # Set the default root sharing
-        print( "Setting default root sharing for environment '%s' (if applicable)." % config['environment'] )
-        set_default_root_sharing( os.path.join( working_dir, content['name']), config['environment'])
+        set_default_root_sharing( os.path.join( working_dir, content['name']), config['environment'], sharedWith=sharedWith )
 
         # Rsync the new content over the old and delete the differences
         print('Updating %s' % content['name'])
