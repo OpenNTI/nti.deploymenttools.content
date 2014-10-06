@@ -17,6 +17,15 @@ import tempfile
 from functools import partial
 from multiprocessing import Pool
 
+import logging
+
+logger = logging.getLogger('nti.deploymenttools.content')
+logger.setLevel(logging.INFO)
+log_handler = logging.StreamHandler()
+log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
+log_handler.setLevel(logging.DEBUG)
+logger.addHandler(log_handler)
+
 def update_content( config, content , sharedWith=None ):
     content_dir = os.path.join( config['content-library'], content['name'] )
 
@@ -32,12 +41,12 @@ def update_content( config, content , sharedWith=None ):
                 existing_content = json.load( file )
         if existing_content and existing_content['version'] == content['version']:
             # The content has already been updated, do not repeat
-            print( '%s is already up to date.' % content['name'] )
+            logger.debug( '%s is already up to date.' % content['name'] )
             return
         else:
-            print('Updating %s from version %s to %s' % (content['name'], existing_content['version'], content['version']))
+            logger.info('Updating %s from version %s to %s' % (content['name'], existing_content['version'], content['version']))
     else:
-        print('No version file found. Updating %s' % content['name'])
+        logger.info('No version file found. Updating %s' % content['name'])
 
     # Create a temporary working directory
     working_dir = tempfile.mkdtemp()
@@ -48,7 +57,7 @@ def update_content( config, content , sharedWith=None ):
 
     try:
         # Unpack the content archive
-        print('Unpacking the %s archive' % content['name'])
+        logger.debug('Unpacking the %s archive' % content['name'])
         with tarfile.open( name=content['archive'] ) as archive:
             archive.extractall()
 
@@ -63,7 +72,7 @@ def update_content( config, content , sharedWith=None ):
         set_default_root_sharing( os.path.join( working_dir, content['name']), config['environment'], sharedWith=sharedWith )
 
         # Rsync the new content over the old and delete the differences
-        print('Updating %s' % content['name'])
+        logger.debug('Updating %s' % content['name'])
         cmd = [ 'rsync', '-a', '--delete', os.path.join( working_dir, content['name']), config['content-library'] ]
         subprocess.check_call( cmd )
     finally:
