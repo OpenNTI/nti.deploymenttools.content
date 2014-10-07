@@ -3,7 +3,7 @@
 from __future__ import unicode_literals, print_function
 
 from . import get_content
-from update_content import update_content
+from . import _update_content
 
 import argparse
 import json
@@ -56,7 +56,7 @@ def _process_package(config, package, package_name, base_path):
     config['content-library'] = os.path.dirname(base_path)
     logger.debug(package_name)
     content = get_content( config=config, prefix=config['package-source'], title=package_name )[0]
-    update_content( config, content, sharedWith=package['sharedWith'] )
+    _update_content( config, content, sharedWith=package['sharedWith'] )
 
 def _process_dictionary(config, dictionary, dictionary_name, base_path):
     # Create a temporary working directory

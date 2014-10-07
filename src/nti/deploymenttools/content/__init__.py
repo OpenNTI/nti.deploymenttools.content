@@ -14,6 +14,7 @@ import sqlite3
 import subprocess
 import sys
 import tarfile
+import tempfile
 
 import logging
 
@@ -505,6 +506,60 @@ def remove_content( content_store, content ):
         content_path = os.path.join(content_store,state, os.path.basename(content['archive']))
         if os.path.exists( content_path ):
             os.remove( content_path )
+
+def _update_content( config, content , sharedWith=None ):
+    content_dir = os.path.join( config['content-library'], content['name'] )
+
+    # If the content directory does not exist, then create it.
+    if not os.path.exists( content_dir ):
+        os.makedirs( content_dir )
+
+    # Check if the content is current
+    version_file = os.path.join( config['content-library'], content['name'], '.version' )
+    if os.path.exists( version_file ):
+        existing_content = None
+        with open( version_file, 'rb' ) as file:
+                existing_content = json.load( file )
+        if existing_content and existing_content['version'] == content['version']:
+            # The content has already been updated, do not repeat
+            logger.debug( '%s is already up to date.' % content['name'] )
+            return
+        else:
+            logger.info('Updating %s from version %s to %s' % (content['name'], existing_content['version'], content['version']))
+    else:
+        logger.info('No version file found. Updating %s' % content['name'])
+
+    # Create a temporary working directory
+    working_dir = tempfile.mkdtemp()
+    # Store the current working directory
+    orig_dir = os.getcwd()
+    # Change the current working directory to the temp directory
+    os.chdir( working_dir )
+
+    try:
+        # Unpack the content archive
+        logger.debug('Unpacking the %s archive' % content['name'])
+        with tarfile.open( name=content['archive'] ) as archive:
+            archive.extractall()
+
+        # Add .version file if not present
+        if not os.path.exists( os.path.join(content['name'] , '.version') ):
+            with open( os.path.join(content['name'] , '.version'), 'wb' ) as file:
+                _t = content.pop('archive')
+                json.dump( content, file )
+                content['archive'] = _t
+
+        # Set the default root sharing
+        set_default_root_sharing( os.path.join( working_dir, content['name']), config['environment'], sharedWith=sharedWith )
+
+        # Rsync the new content over the old and delete the differences
+        logger.debug('Updating %s' % content['name'])
+        cmd = [ 'rsync', '-a', '--delete', os.path.join( working_dir, content['name']), config['content-library'] ]
+        subprocess.check_call( cmd )
+    finally:
+        # Clean-up
+        os.chdir(orig_dir)
+        shutil.rmtree(working_dir)
 
 def _legacy_default_root_sharing_lookup( content, environment= 'prod' ):
     filename = os.path.join( os.path.dirname( __file__ ), 'default_sharing.json' )
