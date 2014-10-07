@@ -102,12 +102,7 @@ def _process_library_contents(config, entry, entry_key, base_path):
         _process_dictionary(config, entry, entry_key, base_path)
     else:
         for item in entry:
-            if item == 'ContentPackageBundles':
-                path = os.path.join(base_path, item)
-                if not os.path.exists(path):
-                    os.mkdir(path)
-                _process_library_contents(config, entry[item], item, path)
-            elif item == 'Dictionaries':
+            if item == 'Dictionaries':
                 _process_library_contents(config, entry[item], item, base_path)
             elif item == 'Packages':
                 _process_library_contents(config, entry[item], item, base_path)
