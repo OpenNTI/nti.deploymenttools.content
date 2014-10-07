@@ -133,8 +133,6 @@ def _parse_args():
                              help="Path from which the content is served from" )
     arg_parser.add_argument( '-s', '--content-store', dest='content_store', default='', 
                              help="Path to the content package collection" )
-    arg_parser.add_argument( '--environment', default='prod', 
-                             help="Defines which environment settings to use. Valid choices are 'alpha' and 'prod'." )
     arg_parser.add_argument( '-f', '--catalogfile', default='', 
                              help="A site-library catalog file." )
     return arg_parser.parse_args()
@@ -145,7 +143,7 @@ def main():
 
     # Build the effective config. This will be important when all of the command line arguments are hooked up.
     config = {}
-    config['environment'] = args.environment
+    config['environment'] = 'prod'
     config['content-store'] = args.content_store
     config['content-library'] = args.content_library
     config['config-dir'] = os.path.dirname(catalogfile)
