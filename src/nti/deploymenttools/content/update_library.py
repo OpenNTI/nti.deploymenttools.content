@@ -60,9 +60,9 @@ def _process_library_contents(config, entry, entry_key, base_path):
         _process_bundle(entry, entry_key, base_path)
     elif 'sharedWith' in entry:
         _process_package(config, entry, entry_key, base_path)
-    elif 'src' in entry:
+    elif 'site-src' in entry:
         catalog = {}
-        with open( os.path.join(config['config-dir'], entry['src']), 'rb' ) as file:
+        with open( os.path.join(config['config-dir'], entry['site-src']), 'rb' ) as file:
             catalog = json.load( file )
 
         # Process the keys in 'Contents'
