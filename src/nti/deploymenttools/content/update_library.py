@@ -9,6 +9,9 @@ import argparse
 import json
 import os
 import subprocess
+import shutil
+import tarfile
+import tempfile
 
 import logging
 
@@ -55,6 +58,34 @@ def _process_package(config, package, package_name, base_path):
     content = get_content( config=config, prefix=config['package-source'], title=package_name )[0]
     update_content( config, content, sharedWith=package['sharedWith'] )
 
+def _process_dictionary(config, dictionary, dictionary_name, base_path):
+    # Create a temporary working directory
+    working_dir = tempfile.mkdtemp()
+    # Store the current working directory
+    orig_dir = os.getcwd()
+    # Change the current working directory to the temp directory
+    os.chdir( working_dir )
+
+    try:
+        # Get dictionary archive
+        logger.debug('Downloading dictionary: %s' % dictionary_name)
+        cmd = ['wget', '-q', dictionary['dictionary-src'] ]
+        subprocess.check_call( cmd )
+
+        # Unpack the dictionary archive
+        logger.debug('Unpacking dictionary: %s' % dictionary_name)
+        with tarfile.open( name=os.path.basename(dictionary['dictionary-src']) ) as archive:
+            archive.extractall()
+
+        # Rsync the dictionary archive
+        logger.debug('Updating dictionary: %s' % dictionary_name)
+        cmd = [ 'rsync', '-a', '--delete', os.path.join( working_dir, dictionary_name), os.path.dirname(base_path) ]
+        subprocess.check_call( cmd )
+    finally:
+        # Clean-up
+        os.chdir(orig_dir)
+        shutil.rmtree(working_dir)
+
 def _process_library_contents(config, entry, entry_key, base_path):
     if 'svn-rev' in entry:
         _process_bundle(entry, entry_key, base_path)
@@ -67,6 +98,8 @@ def _process_library_contents(config, entry, entry_key, base_path):
 
         # Process the keys in 'Contents'
         _process_library_contents(config, catalog['Contents'], catalog['site-name'], base_path)
+    elif 'dictionary-src' in entry:
+        _process_dictionary(config, entry, entry_key, base_path)
     else:
         for item in entry:
             if item == 'ContentPackageBundles':
@@ -74,6 +107,8 @@ def _process_library_contents(config, entry, entry_key, base_path):
                 if not os.path.exists(path):
                     os.mkdir(path)
                 _process_library_contents(config, entry[item], item, path)
+            elif item == 'Dictionaries':
+                _process_library_contents(config, entry[item], item, base_path)
             elif item == 'Packages':
                 _process_library_contents(config, entry[item], item, base_path)
             else:
