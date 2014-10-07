@@ -16,10 +16,10 @@ import tempfile
 import logging
 
 logger = logging.getLogger('nti.deploymenttools.content')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 log_handler = logging.StreamHandler()
 log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
-log_handler.setLevel(logging.DEBUG)
+log_handler.setLevel(logging.INFO)
 logger.addHandler(log_handler)
 
 def _process_bundle(bundle, bundle_name, base_path):
@@ -54,7 +54,6 @@ def _process_bundle(bundle, bundle_name, base_path):
 
 def _process_package(config, package, package_name, base_path):
     config['content-library'] = os.path.dirname(base_path)
-    logger.debug(package_name)
     content = get_content( config=config, prefix=config['package-source'], title=package_name )[0]
     _update_content( config, content, sharedWith=package['sharedWith'] )
 
