@@ -56,6 +56,12 @@ def _process_package(config, package, package_name, base_path):
     config['content-library'] = os.path.dirname(base_path)
     content = get_content( config=config, prefix=config['package-source'], title=package_name )[0]
     _update_content( config, content, sharedWith=package['sharedWith'] )
+    key = u'presentation-assets'
+    if key in package:
+        path = os.path.join(base_path, key)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        _process_bundle(package['presentation-assets'], 'presentation-assets', path)
 
 def _process_dictionary(config, dictionary, dictionary_name, base_path):
     # Create a temporary working directory
