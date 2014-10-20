@@ -106,6 +106,7 @@ def _process_library_contents(config, entry, entry_key, base_path):
             elif item == 'Packages':
                 _process_library_contents(config, entry[item], item, base_path)
             else:
+                logger.debug("Processing %s:" % item)
                 path = os.path.join(base_path, item)
                 if not os.path.exists(path):
                     os.mkdir(path)
