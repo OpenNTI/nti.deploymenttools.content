@@ -139,13 +139,13 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-    catalogfile = os.path.expanduser( args.catalogfile )
+    catalogfile = os.path.abspath(os.path.expanduser( args.catalogfile ))
 
     # Build the effective config. This will be important when all of the command line arguments are hooked up.
     config = {}
     config['environment'] = 'prod'
-    config['content-store'] = args.content_store
-    config['content-library'] = args.content_library
+    config['content-store'] = os.path.abspath(os.path.expanduser(args.content_store))
+    config['content-library'] = os.path.abspath(os.path.expanduser(args.content_library))
     config['config-dir'] = os.path.dirname(catalogfile)
 
     update_library(config, catalogfile)
