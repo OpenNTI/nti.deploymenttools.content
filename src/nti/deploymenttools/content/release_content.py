@@ -11,10 +11,18 @@ import argparse
 import codecs
 import ConfigParser
 import json
+import logging
 import os
 import subprocess
 
 from xml.dom import minidom
+
+logger = logging.getLogger('nti.deploymenttools.content')
+logger.setLevel(logging.INFO)
+log_handler = logging.StreamHandler()
+log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
+log_handler.setLevel(logging.INFO)
+logger.addHandler(log_handler)
 
 def _check_svn_revision( working_copy_path ):
     revision = None
@@ -30,7 +38,7 @@ def _check_svn_revision( working_copy_path ):
             revision = commit_nodes[0].getAttribute('revision')
 
     except:
-        print(stderr)
+        logger.error(stderr)
 
     return revision
 
@@ -121,14 +129,14 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
     _write_global_catalog( config['catalog-file'], catalog )
 
 def mark_package_for_release( config, content, dest='release' ):
-    print( 'Marking %s version %s for %s.' % ( content['name'], content['version'], dest ) )
+    logger.info( 'Marking %s version %s for %s.' % ( content['name'], content['version'], dest ) )
     entry = get_from_catalog(config['content-store'], title=content['name'], version=content['version'])
     if entry:
         symlink_content( config, entry[0], dest )
         entry[0]['state'].append(dest)
         update_catalog(config['content-store'], entry)
     else:
-        print('Unable to find %s, version %s, in the catalog' % ( content['name'], content['version'] ) )
+        logger.warning('Unable to find %s, version %s, in the catalog' % ( content['name'], content['version'] ) )
 
 DEFAULT_CONFIG_FILE='~/etc/nti_util_conf.ini'
 
@@ -184,9 +192,9 @@ def main():
         elif os.path.exists( os.path.join( content_path, 'bundle_meta_info.json' ) ):
             mark_bundle_for_release( config, content_path, dest=args.pool )
         else:
-            print( '%s does not contain valid content' % content_path )
+            logger.warning( '%s does not contain valid content' % content_path )
     else:
-        print( 'No valid content found' )
+        logger.warning( 'No valid content found' )
 
 if __name__ == '__main__': # pragma: no cover
         main()
