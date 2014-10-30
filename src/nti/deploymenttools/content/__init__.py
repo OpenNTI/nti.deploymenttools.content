@@ -469,7 +469,8 @@ def symlink_content( config, content, dest='' ):
             os.chdir( os.path.join( config['content-store'], dest ) )
             rel_path = os.path.relpath( content['archive'] )
             filename = '-'.join( [ content['name'], content['builder'], content['version'] ] ) + '.tgz'
-            os.symlink( rel_path, filename )
+            if not os.path.exists(filename):
+                os.symlink( rel_path, filename )
             content['archive'] = os.path.join( config['content-store'], dest, filename )
         finally:
             os.chdir(old_cwd)
