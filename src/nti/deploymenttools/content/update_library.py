@@ -54,7 +54,10 @@ def _process_bundle(bundle, bundle_name, base_path):
 
 def _process_package(config, package, package_name, base_path):
     config['content-library'] = os.path.dirname(base_path)
-    content = get_content( config=config, prefix=config['package-source'], title=package_name )[0]
+    version = ''
+    if 'version' in package:
+        version = package['version']
+    content = get_content( config=config, prefix=config['package-source'], title=package_name, version=version )[0]
     _update_content( config, content, sharedWith=package['sharedWith'] )
     key = u'presentation-assets'
     if key in package:
