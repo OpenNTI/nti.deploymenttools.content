@@ -26,7 +26,7 @@ logger.addHandler(log_handler)
 def _process_bundle(bundle, bundle_name, base_path):
     if os.path.exists(os.path.join(base_path, '.svn')):
         current_rev = get_svn_revision(base_path)
-        if (current != bundle["svn_rev"]):
+        if (current_rev != bundle["svn_rev"]):
             logger.info("Updating %s to rev %s." % (bundle_name, bundle["svn-rev"]))
             old_cwd = os.getcwd()
             try:
