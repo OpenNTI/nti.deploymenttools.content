@@ -34,7 +34,8 @@ setup(
 		"Natural Language :: English",
 		"Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
 	],
-	requires = [
+	install_requires = [
+		'setuptools',
 		'nti.dataserver',
 		'boto',
 		'lxml',
