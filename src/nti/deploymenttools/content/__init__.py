@@ -23,6 +23,24 @@ from xml.dom.minidom import parse as xmlparse
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
+def get_svn_revision( working_copy_path ):
+    revision = None
+
+    try:
+        cmd = ['svn', 'info', '--xml', working_copy_path]
+        process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+
+        dom = minidom.parseString(stdout)
+        commit_nodes = dom.getElementsByTagName('commit')
+        if len(commit_nodes) > 0:
+            revision = commit_nodes[0].getAttribute('revision')
+
+    except:
+        logger.error(stderr)
+
+    return revision
+
 def compare_files( file_1, file_2 ):
     """Computes the hashes for file_1 and file_2 and returns if they are equal or not"""
     # Compute the hash for file 1
