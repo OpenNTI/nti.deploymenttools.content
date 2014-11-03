@@ -3,6 +3,7 @@
 from __future__ import unicode_literals, print_function
 
 from . import get_content
+from . import get_svn_revision
 from . import _update_content
 
 import argparse
@@ -24,18 +25,20 @@ logger.addHandler(log_handler)
 
 def _process_bundle(bundle, bundle_name, base_path):
     if os.path.exists(os.path.join(base_path, '.svn')):
-        logger.info("Updating %s to rev %s." % (bundle_name, bundle["svn-rev"]))
-        old_cwd = os.getcwd()
-        try:
-            os.chdir(base_path)
-            cmd = [
-                'svn',
-                'up',
-                '-r', bundle["svn-rev"]
-            ]
-            subprocess.call( cmd )
-        finally:
-            os.chdir(old_cwd)
+        current_rev = get_svn_rev(base_path)
+        if (current != bundle["svn_rev"]):
+            logger.info("Updating %s to rev %s." % (bundle_name, bundle["svn-rev"]))
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(base_path)
+                cmd = [
+                    'svn',
+                    'up',
+                    '-r', bundle["svn-rev"]
+                ]
+                subprocess.call( cmd )
+            finally:
+                os.chdir(old_cwd)
     else:
         logger.info("Checkout %s, rev %s to %s" % (bundle["svn-url"], bundle["svn-rev"],base_path))
         old_cwd = os.getcwd()

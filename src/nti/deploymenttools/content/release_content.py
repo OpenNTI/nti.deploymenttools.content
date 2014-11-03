@@ -4,6 +4,7 @@ from __future__ import unicode_literals, print_function
 
 from . import get_content_metadata
 from . import get_from_catalog
+from . import get_svn_revision
 from . import symlink_content
 from . import update_catalog
 
@@ -23,24 +24,6 @@ log_handler = logging.StreamHandler()
 log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
 log_handler.setLevel(logging.INFO)
 logger.addHandler(log_handler)
-
-def _check_svn_revision( working_copy_path ):
-    revision = None
-
-    try:
-        cmd = ['svn', 'info', '--xml', working_copy_path]
-        process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-
-        dom = minidom.parseString(stdout)
-        commit_nodes = dom.getElementsByTagName('commit')
-        if len(commit_nodes) > 0:
-            revision = commit_nodes[0].getAttribute('revision')
-
-    except:
-        logger.error(stderr)
-
-    return revision
 
 def _read_global_catalog( catalog_file ):
     catalog = {}
@@ -111,7 +94,7 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
         return site_path
 
     catalog = _read_global_catalog(config['catalog-file'])
-    revision = _check_svn_revision( bundle )
+    revision = get_svn_revision( bundle )
     bundle_metadata = _read_bundle_metadata( bundle )
     site_path = _get_site_path( bundle )
     bundle_packages = _find_bundle_packages( bundle_metadata, site_path )
