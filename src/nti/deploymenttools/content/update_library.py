@@ -27,7 +27,7 @@ def _process_bundle(bundle, bundle_name, base_path):
     if os.path.exists(os.path.join(base_path, '.svn')):
         current_rev = get_svn_revision(base_path)
         if (current_rev != bundle["svn-rev"]):
-            logger.info("Updating %s to rev %s." % (bundle_name, bundle["svn-rev"]))
+            logger.info("Updating %s to from rev %s to %s." % (bundle_name, current_rev, bundle["svn-rev"]))
             old_cwd = os.getcwd()
             try:
                 os.chdir(base_path)
