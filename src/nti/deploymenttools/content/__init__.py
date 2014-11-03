@@ -19,6 +19,7 @@ import tempfile
 import logging
 
 from xml.dom.minidom import parse as xmlparse
+from xml.dom.minidom import parseString as xmlparseString
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -31,7 +32,7 @@ def get_svn_revision( working_copy_path ):
         process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
 
-        dom = minidom.parseString(stdout)
+        dom = xmlparseString(stdout)
         commit_nodes = dom.getElementsByTagName('commit')
         if len(commit_nodes) > 0:
             revision = commit_nodes[0].getAttribute('revision')
