@@ -7,6 +7,7 @@ from . import get_svn_revision
 from . import _update_content
 
 import argparse
+import codecs
 import json
 import os
 import subprocess
@@ -55,6 +56,21 @@ def _process_bundle(bundle, bundle_name, base_path):
         finally:
             os.chdir(old_cwd)
 
+def _process_course_info_overrides(course_info_file, overrides):
+    course_info = None
+    if os.path.exists(course_info_file):
+        with codecs.open(course_info_file, 'rb', 'utf-8') as file:
+            course_info = json.load(file)
+    else:
+        course_info = {}
+
+    for key in overrides:
+        course_info[key] = overrides[key]
+
+    with codecs.open(course_info_file, 'wb', 'utf-8') as file:
+        json.dump( course_info, file, indent=4, separators=(',', ': '), sort_keys=True )
+        file.write('\n')
+
 def _process_package(config, package, package_name, base_path):
     config['content-library'] = os.path.dirname(base_path)
     version = ''
@@ -68,6 +84,10 @@ def _process_package(config, package, package_name, base_path):
         if not os.path.exists(path):
             os.mkdir(path)
         _process_bundle(package['presentation-assets'], 'presentation-assets', path)
+    key = u'course_info_override'
+    if key in package:
+        path = os.path.join(base_path, 'course_info.json')
+        _process_course_info_overrides(path, package[key])
 
 def _process_dictionary(config, dictionary, dictionary_name, base_path):
     # Create a temporary working directory
