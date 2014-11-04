@@ -14,6 +14,7 @@
 		"mathcounts2012": "MATHCOUNTS",
 		"mathcounts2013": "MATHCOUNTS",
 		"mathcounts2014": "MATHCOUNTS",
+		"mathcounts2015": "MATHCOUNTS",
 		"MATHCOUNTS_Chapter_Competition2012": "MATHCOUNTS",
 		"MATHCOUNTS_School_Competition2012": "MATHCOUNTS",
 		"MATHCOUNTS_State_Competition2012": "MATHCOUNTS",
@@ -49,13 +50,15 @@
 		"GEOL1114_Physical_Geology": "tag:nextthought.com,2011-10:elmo3302-MeetingRoom:Group-geol1114spring2014.ou.nextthought.com",
 		"HSCI3013_History_of_Science": "tag:nextthought.com,2011-10:magr9201-MeetingRoom:Group-hsci3013spring2014.ou.nextthought.com",
 		"PSC4283_Civil_Rights_and_Civil_Liberties": "tag:nextthought.com,2011-10:wert4649-MeetingRoom:Group-psc4283spring2014.ou.nextthought.com",
-		"SOC1113_Intro_to_Sociology": "tag:nextthought.com,2011-10:damp8528-MeetingRoom:Group-soc1113spring2014.ou.nextthought.com"
+		"SOC1113_Intro_to_Sociology": "tag:nextthought.com,2011-10:damp8528-MeetingRoom:Group-soc1113spring2014.ou.nextthought.com",
+		"UTSAEval": "UTSAEval.utsa.nextthought.com"
 	},
 	"alpha": {
 		"04630_Course_Fall2013": "tag:nextthought.com,2011-10:schmidtke-MeetingRoom:Group-cspe2013_schmidtke_8bd7eb7a_f950_40fe_6550_e88635f6050f",
 		"mathcounts2012": "MathCounts",
 		"mathcounts2013": "MathCounts",
 		"mathcounts2014": "MathCounts",
+		"mathcounts2015": "MathCounts",
 		"MATHCOUNTS_Chapter_Competition2012": "MathCounts",
 		"MATHCOUNTS_School_Competition2012": "MathCounts",
 		"MATHCOUNTS_State_Competition2012": "MathCounts",
