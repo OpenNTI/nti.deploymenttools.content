@@ -51,12 +51,12 @@ def _write_global_catalog( catalog_file, catalog ):
                 json.dump( catalog[site], file, indent=4, separators=(',', ': '), sort_keys=True )
                 file.write('\n')
 
-def _commit_global_catalog( catalog_file ):
+def _commit_global_catalog( catalog_file, content ):
     repo_dir = os.path.dirname( catalog_file )
-    cmd = ['svn', 'commit', repo_dir]
+    cmd = ['svn', 'commit', repo_dir, '-m', 'Update versions for %s.' % (content,)]
     process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    logger.info(stdout)
+    logger.info('%s\n%s' (stdout, stderr))
 
 def _read_bundle_metadata( bundle ):
     bundle_data = None
@@ -117,7 +117,7 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
             mark_package_for_release(config, bundle_package, dest)
 
     _write_global_catalog( config['catalog-file'], catalog )
-    _commit_global_catalog( config['catalog-file'] )
+    _commit_global_catalog( config['catalog-file'], os.path.basename(bundle) )
 
 def mark_package_for_release( config, content, dest='release' ):
     logger.info( 'Marking %s version %s for %s.' % ( content['name'], content['version'], dest ) )
