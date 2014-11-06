@@ -56,7 +56,7 @@ def _commit_global_catalog( catalog_file, content ):
     cmd = ['svn', 'commit', repo_dir, '-m', 'Update versions for %s.' % (content,)]
     process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    logger.info('%s\n%s' (stdout, stderr))
+    logger.info('%s\n%s' % (stdout, stderr))
 
 def _read_bundle_metadata( bundle ):
     bundle_data = None
