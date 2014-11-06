@@ -51,6 +51,13 @@ def _write_global_catalog( catalog_file, catalog ):
                 json.dump( catalog[site], file, indent=4, separators=(',', ': '), sort_keys=True )
                 file.write('\n')
 
+def _commit_global_catalog( catalog_file ):
+    repo_dir = os.path.dirname( catalog_file )
+    cmd = ['svn', 'commit', repo_dir]
+    process = subprocess.Popen(cmd, bufsize=-1, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    logger.info(stdout)
+
 def _read_bundle_metadata( bundle ):
     bundle_data = None
     bundle_file = os.path.join(bundle, 'bundle_meta_info.json')
@@ -110,6 +117,7 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
             mark_package_for_release(config, bundle_package, dest)
 
     _write_global_catalog( config['catalog-file'], catalog )
+    _commit_global_catalog( config['catalog-file'] )
 
 def mark_package_for_release( config, content, dest='release' ):
     logger.info( 'Marking %s version %s for %s.' % ( content['name'], content['version'], dest ) )
