@@ -157,6 +157,8 @@ def _write_catalog( conn, catalog ):
             cursor.execute('SELECT COUNT(*) FROM state WHERE recordId=? and state=?', (row_id, state))
             if int(cursor.fetchone()[0]) == 0:
                 cursor.execute('INSERT INTO state VALUES (?,?)', (row_id, state))
+            else:
+                logger.debug('%s, version %s, is already in %s', (entry['name'], entry['version'], state))
 
     conn.commit()
 
@@ -425,7 +427,7 @@ def update_catalog( content_store, content_list):
             archive = os.path.relpath(entry['archive'], content_store)
             cursor.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?)', (entry['name'], int(entry['version']), entry['builder'], int(entry['build_time']), entry['indexer'], int(entry['index_time']), archive))
         else:
-            logger.info('%s, version %s, is already in the database.' % (entry['name'], entry['version']))
+            logger.debug('%s, version %s, is already in the database.' % (entry['name'], entry['version']))
 
         cursor.execute('SELECT _rowid_ FROM records WHERE name=? AND version=?', (entry['name'], int(entry['version'])))
         row_id = cursor.fetchone()[0]
@@ -433,6 +435,8 @@ def update_catalog( content_store, content_list):
             cursor.execute('SELECT COUNT(*) FROM state WHERE recordId=? AND state=?', (row_id, state))
             if int(cursor.fetchone()[0]) == 0:
                 cursor.execute('INSERT INTO state VALUES (?,?)', (row_id, state))
+            else:
+                logger.debug('%s, version %s, is already in %s', (entry['name'], entry['version'], state))
         cursor.execute('SELECT state FROM state WHERE recordId=?', (row_id,))
         states = cursor.fetchall()
         for state in states:
