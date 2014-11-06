@@ -78,7 +78,7 @@ def _process_package(config, package, package_name, base_path):
         version = package['version']
     content = None
     packages = get_content( config=config, prefix=config['package-source'], title=package_name, version=version )
-    if len(packages > 0):
+    if len(packages) > 0:
         content = packages[0]
     else:
         logger.warning('No content package found for %s.' % package_name)
