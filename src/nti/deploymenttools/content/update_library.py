@@ -76,7 +76,13 @@ def _process_package(config, package, package_name, base_path):
     version = ''
     if 'version' in package:
         version = package['version']
-    content = get_content( config=config, prefix=config['package-source'], title=package_name, version=version )[0]
+    content = None
+    packages = get_content( config=config, prefix=config['package-source'], title=package_name, version=version )
+    if len(packages > 0):
+        content = packages[0]
+    else:
+        logger.warning('No content package found for %s.' % package_name)
+        return
     _update_content( config, content, sharedWith=package['sharedWith'] )
     key = u'presentation-assets'
     if key in package:
