@@ -83,6 +83,9 @@ def _process_package(config, package, package_name, base_path):
         path = os.path.join(base_path, key)
         if not os.path.exists(path):
             os.mkdir(path)
+        elif not os.path.exists(os.path.join(path,u'.svn')):
+            shutil.rmtree(path)
+            os.mkdir(path)
         _process_bundle(package['presentation-assets'], 'presentation-assets', path)
     key = u'course_info_override'
     if key in package:
