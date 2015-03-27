@@ -52,6 +52,19 @@ def _version_files( file_list ):
                             asset_rev_map[file_hash] = [src]
                     new_filename = os.path.splitext(node.attrib['src'])[0]+u'-'+file_hash+os.path.splitext(node.attrib['src'])[1]
                     node.attrib['src'] = new_filename
+                elif 'link' == node.tag and 'rel' in node.attrib and 'stylesheet' == node.attrib['rel'] and 'href' in node.attrib and os.path.exists(node.attrib['href']):
+                    src = os.path.abspath(node.attrib['href'])
+                    if src in asset_fwd_map:
+                        file_hash = asset_fwd_map[src]
+                    else:
+                        file_hash = _get_file_hash(src)
+                        asset_fwd_map[src] = file_hash
+                        if file_hash in asset_rev_map:
+                            asset_rev_map[file_hash].append(src)
+                        else:
+                            asset_rev_map[file_hash] = [src]
+                    new_filename = os.path.splitext(node.attrib['href'])[0]+u'-'+file_hash+os.path.splitext(node.attrib['href'])[1]
+                    node.attrib['href'] = new_filename
         with open(file, 'wb') as f:
             f.write(etree.tostring(doc.getroot(), pretty_print=True, method="html"))
 
