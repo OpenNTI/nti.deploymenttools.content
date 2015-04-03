@@ -103,7 +103,7 @@ def publish_landing_page( config ):
                 file_list.append(os.path.join(root, file))
     _version_files( file_list )
 
-    headers = ['Cache-Control=max-age=3600']
+    headers = ['Cache-Control=max-age=%s' % config['cache-max-age']]
     _push_content(config['content-path'], access_key=config['aws-access-key'], secret_key=config['aws-secret-key'], bucket=config['bucket'], prefix=config['prefix'], headers=headers)
 
 def _parse_args():
@@ -112,6 +112,7 @@ def _parse_args():
     arg_parser.add_argument( '-a', '--accesskey', default='', help="AWS access key" )
     arg_parser.add_argument( '-s', '--secretkey', default='', help="AWS secret key" )
     arg_parser.add_argument( '-b', '--bucket', default='', help="S3 bucket to publish the content to" )
+    arg_parser.add_argument( '--cache-max-age', dest='cache_max_age', default='3600', help="Duration for the cache control header." )
     arg_parser.add_argument( '-p', '--prefix', default='', 
                              help="A file path prefix that will be stripped from the full path of the file when determining the key name in S3." )
     arg_parser.add_argument( 'contentpath', default='.',
@@ -134,6 +135,7 @@ def main():
     config['bucket'] = args.bucket
     config['content-path'] = content_path
     config['prefix'] = args.prefix
+    config['cache-max-age'] = args.cache_max_age
 
     publish_landing_page( config )
 
