@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
+VERSION = '0.0'
+
 entry_points = {
 	'console_scripts': [
 		'publish_content = nti.deploymenttools.content.publish_content:main',
@@ -18,9 +20,9 @@ entry_points = {
 
 setup(
 	name = 'nti.deploymenttools',
-	version = '0.0',
-	keywords = 'web',
-	author = 'NTI',
+	version = VERSION,
+	keywords = 'deployment tools',
+	author = 'Sean Jones',
 	author_email = 'sean.jones@nextthought.com',
 	description = 'NextThought Platform Deployment Tools',
 	long_description = 'Dataserver README',
