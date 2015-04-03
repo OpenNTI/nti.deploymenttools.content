@@ -38,9 +38,8 @@ setup(
 	],
 	install_requires = [
 		'setuptools',
-		'nti.dataserver',
+		'nti.contentrendering',
 		'boto',
-		'lxml',
 	],
 	packages = find_packages( 'src' ),
 	package_dir = {'': 'src'},
