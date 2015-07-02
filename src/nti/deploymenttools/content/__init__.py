@@ -158,7 +158,7 @@ def _write_catalog( conn, catalog ):
             if int(cursor.fetchone()[0]) == 0:
                 cursor.execute('INSERT INTO state VALUES (?,?)', (row_id, state))
             else:
-                logger.debug('%s, version %s, is already in %s', (entry['name'], entry['version'], state))
+                logger.debug('%s, version %s, is already in %s' % (entry['name'], entry['version'], state))
 
     conn.commit()
 
