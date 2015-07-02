@@ -14,7 +14,6 @@ entry_points = {
 		'build_content_catalog = nti.deploymenttools.content.build_catalog:main',
 		'gc_content_catalog = nti.deploymenttools.content.gc_catalog:main',
 		'nti_update_library = nti.deploymenttools.content.update_library:main',
-		'nti_s3_publish_landingpage = nti.deploymenttools.landingpage.s3_publish_landing:main',
 	]
 }
 
