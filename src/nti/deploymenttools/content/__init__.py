@@ -271,7 +271,7 @@ def gc_catalog( content_store ):
         cursor = conn.cursor()
 
         # Fetch the records
-        cursor.execute('SELECT a.recordId FROM (SELECT recordId, count(recordId) AS num FROM state GROUP BY recordId) AS a JOIN  state ON (a.recordId = state.recordId) WHERE num = 1 AND state = ?', ('testing',))
+        cursor.execute('SELECT a.recordId FROM (SELECT recordId, count(recordId) AS num FROM state GROUP BY recordId) AS a JOIN  state ON (a.recordId = state.recordId) WHERE num <= 2 AND state IN (?, ?)', ('testing', 'uat'))
 
         gc_candidates = []
         results = cursor.fetchall()
@@ -282,7 +282,31 @@ def gc_catalog( content_store ):
         return gc_candidates
 
     gc_candidates =  _get_gc_candidates( content_store )
-    latest_content = get_latest_from_catalog( content_store, category='testing' )
+
+    #Dedup the candidate list
+    deduped_list = []
+    for candidate in gc_candidates:
+        if candidate not in deduped_list:
+            deduped_list.append(candidate)
+    gc_candidates =  deduped_list
+    deduped_list = []
+
+    # Removing any content tagged for release
+    pruned_list = []
+    for candidate in gc_candidates:
+        if u'release' not in candidate['state']:
+            pruned_list.append(candidate)
+    gc_candidates =  pruned_list
+    pruned_list = []
+
+    gc_count = len(gc_candidates)
+    logger.info('Garbage collecting %d content packages' % (gc_count, ))
+#    for candidate in gc_candidates:
+#        print(candidate['name'],candidate['version'],candidate['state'])
+
+    latest_content = []
+    latest_content.extend(get_latest_from_catalog( content_store, category='testing' ))
+    latest_content.extend(get_latest_from_catalog( content_store, category='uat' ))
 
     # Pruning the latest version of each content item from the pool
     pruned_list = []
@@ -290,11 +314,15 @@ def gc_catalog( content_store ):
         for latest in latest_content:
             if candidate['name'] == latest['name'] and candidate['version'] == latest['version']:
                 logger.debug('Removing latest %s, version %s, from candidate GC pool' % (candidate['name'], candidate['version']))
-                pruned_list.append(candidate)
+                if candidate not in pruned_list:
+                    pruned_list.append(candidate)
 
     # Remove pruned entries
     for item in pruned_list:
-        gc_candidates.remove(item)
+        if item in gc_candidates:
+            gc_candidates.remove(item)
+        else:
+            print(item)
     pruned_list = []
 
     # Pruning content that is less than a day old from the pool
@@ -313,7 +341,8 @@ def gc_catalog( content_store ):
     gc_count = len(gc_candidates)
     logger.info('Garbage collecting %d content packages' % (gc_count, ))
     for candidate in gc_candidates:
-        remove_content( content_store, candidate)
+        print(candidate['name'],candidate['version'],candidate['state'])
+#        remove_content( content_store, candidate)
 
 def _open_catalog( content_store ):
     if _is_content_package(content_store):
