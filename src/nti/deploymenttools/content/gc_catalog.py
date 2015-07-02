@@ -11,10 +11,10 @@ import os
 import logging
 
 logger = logging.getLogger('nti.deploymenttools.content')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 log_handler = logging.StreamHandler()
 log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
-log_handler.setLevel(logging.INFO)
+log_handler.setLevel(logging.DEBUG)
 logger.addHandler(log_handler)
 
 DEFAULT_CONFIG_FILE='~/etc/nti_util_conf.ini'
