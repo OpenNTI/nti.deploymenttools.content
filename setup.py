@@ -18,7 +18,7 @@ entry_points = {
 }
 
 setup(
-	name = 'nti.deploymenttools',
+	name = 'nti.deploymenttools.content',
 	version = VERSION,
 	keywords = 'deployment tools',
 	author = 'Sean Jones',
