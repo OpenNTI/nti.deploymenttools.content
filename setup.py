@@ -44,7 +44,7 @@ setup(
 	package_dir = {'': 'src'},
 	package_data = {'nti': [ 'deploymenttools/content/default_sharing.json' ]},
 	include_package_data = True,
-	namespace_packages=['nti',],
+	namespace_packages=['nti', 'nti.deploymenttools'],
 	zip_safe = False,
 	entry_points = entry_points
 	)
