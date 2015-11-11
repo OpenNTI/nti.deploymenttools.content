@@ -1,5 +1,5 @@
 # Ignore the Python egg info data
-nti.deploymenttools.egg-info
+nti.deploymenttools.content.egg-info
 
 # Ignore directories created by distutils
 build
