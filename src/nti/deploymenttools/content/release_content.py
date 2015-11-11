@@ -76,19 +76,39 @@ def _find_bundle_packages( bundle_metadata, site_path ):
                 toc_ntiid = toc_nodes[0].getAttribute('ntiid')
         return toc_ntiid
 
+    def _resolve_package( ntiid, search_path ):
+        metadata = None
+        for package in os.listdir(search_path):
+            toc_file = os.path.join(search_path, package, 'eclipse-toc.xml')
+            if os.path.exists(toc_file):
+                toc_ntiid = _get_toc_ntiid(toc_file)
+                if toc_ntiid == ntiid:
+                    if os.path.exists(os.path.join(site_dir, package, '.version')):
+                        metadata = get_content_metadata(os.path.join(site_dir, package))
+        return metadata
+
     bundle_packages = []
-    bundle_package_ntiids = bundle_metadata['ContentPackages']
     site_dir = os.path.join(site_path[-1],site_path[-2])
-    for package in os.listdir(site_dir):
-        toc_file = os.path.join(site_dir, package, 'eclipse-toc.xml')
-        if os.path.exists(toc_file):
-            toc_ntiid = _get_toc_ntiid(toc_file)
-            if toc_ntiid in bundle_package_ntiids:
-                if os.path.exists(os.path.join(site_dir, package, '.version')):
-                    bundle_packages.append(get_content_metadata(os.path.join(site_dir, package)))
+    global_dir = os.path.dirname(site_path[-1])
+    for ntiid in bundle_metadata['ContentPackages']:
+        metadata = _resolve_package(ntiid, site_dir)
+        if metadata is not None:
+            bundle_packages.append(metadata)
+        else:
+            metadata = _resolve_package(ntiid, global_dir)
+            if metadata is not None:
+                bundle_packages.append(metadata)
+            else:
+                logger.error(u'Unable to locate a content package with the id %s' % ntiid)
     return bundle_packages
 
 def mark_bundle_for_release( config, bundle, dest='release' ):
+    def _get_bundle_entry(catalog, site_path):
+        if len(site_path) == 1:
+            return catalog[site_path[-1]]
+        else:
+            return _get_bundle_entry(catalog[site_path[-1]], site_path[:-1])
+
     def _get_site_path( bundle_path ):
         path, basename = os.path.split(os.path.abspath(bundle_path))
         site_path = []
@@ -108,7 +128,7 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
     site_catalog = catalog[site_path[-2]]
 
     if revision is not None:
-        bundle_entry = site_catalog['Contents'][site_path[2]][site_path[1]][site_path[0]]
+        bundle_entry = _get_bundle_entry(site_catalog['Contents'],site_path[:-2])
         bundle_entry['svn-rev'] = revision
 
     if len(bundle_packages) > 0:
