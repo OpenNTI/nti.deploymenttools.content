@@ -83,8 +83,8 @@ def _find_bundle_packages( bundle_metadata, site_path ):
             if os.path.exists(toc_file):
                 toc_ntiid = _get_toc_ntiid(toc_file)
                 if toc_ntiid == ntiid:
-                    if os.path.exists(os.path.join(site_dir, package, '.version')):
-                        metadata = get_content_metadata(os.path.join(site_dir, package))
+                    if os.path.exists(os.path.join(search_path, package, '.version')):
+                        metadata = get_content_metadata(os.path.join(search_path, package))
         return metadata
 
     bundle_packages = []
@@ -126,6 +126,7 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
     site_path = _get_site_path( bundle )
     bundle_packages = _find_bundle_packages( bundle_metadata, site_path )
     site_catalog = catalog[site_path[-2]]
+    global_catalog = catalog['global']
 
     if revision is not None:
         bundle_entry = _get_bundle_entry(site_catalog['Contents'],site_path[:-2])
@@ -133,7 +134,10 @@ def mark_bundle_for_release( config, bundle, dest='release' ):
 
     if len(bundle_packages) > 0:
         for bundle_package in bundle_packages:
-            site_catalog['Contents']['Packages'][bundle_package['name']]['version'] = bundle_package['version']
+            if bundle_package['name'] in site_catalog['Contents']['Packages']:
+                site_catalog['Contents']['Packages'][bundle_package['name']]['version'] = bundle_package['version']
+            else:
+                global_catalog['Contents']['Packages'][bundle_package['name']]['version'] = bundle_package['version']
             mark_package_for_release(config, bundle_package, dest)
 
     _write_global_catalog( config['catalog-file'], catalog )
