@@ -5,6 +5,7 @@ from __future__ import unicode_literals, print_function
 from argparse import ArgumentParser
 from getpass import getpass
 from tempfile import mkdtemp
+from time import sleep
 from time import time
 from zipfile import ZipFile
 
@@ -24,7 +25,7 @@ logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Remote Render Utility'
 
-def remote_render(host, user, password, working_dir, timeout=1200.0):
+def remote_render(host, user, password, working_dir, poll_interval):
     def _build_archive(working_dir, temp_dir):
         def _get_job_name(working_dir):
             for file in os.listdir(working_dir):
@@ -47,6 +48,30 @@ def remote_render(host, user, password, working_dir, timeout=1200.0):
                     archive.write(file_path, archive_file_path)
         return archive_path, job_name
 
+    def _monitor_job(response, host, user, password, poll_interval):
+            response_body = response.json()
+            for link in response_body['Items'][job_name+'.zip']['Links']:
+                if link['rel'] == 'error':
+                    error_link = 'https://%s' % host + link['href']
+                elif link['rel'] == 'status':
+                    status_link = 'https://%s' % host + link['href']
+            logger.info('Render job %s submitted.' % (response_body['Items'][job_name+'.zip']['JobId'],))
+            response = requests.get(status_link, headers=headers, auth=(user, password))
+            response.raise_for_status()
+            status = response.json()['status']
+            while ((status == 'Pending') or (status == 'Running')):
+                logger.info("Render is %s" % (status,))
+                sleep(poll_interval)
+                response = requests.get(status_link, headers=headers, auth=(user, password))
+                response.raise_for_status()
+                status = response.json()['status']
+            if status == 'Failed':
+                response = requests.get(error_link, headers=headers, auth=(user, password))
+                response.raise_for_status()
+                logger.error('Render failed.\n%s' % (response.json()['message'],))
+            elif status =='Success':
+                logger.info('Render succeeded.')
+
     url = 'https://%s/dataserver2/Library/@@RenderContentSource' % host
     headers = {
         'user-agent': UA_STRING
@@ -59,10 +84,10 @@ def remote_render(host, user, password, working_dir, timeout=1200.0):
 
         files = {job_name: open(content_archive, 'rb')}
 
-        response = requests.post(url, headers=headers, files=files, auth=(user, password), timeout=timeout)
+        response = requests.post(url, headers=headers, files=files, auth=(user, password))
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
-            logger.info('Render of %s succeeded.' % working_dir)
+            _monitor_job(response, host, user, password, poll_interval)
     except requests.HTTPError:
         logger.error(response.text)
     except requests.exceptions.ReadTimeout as e:
@@ -81,8 +106,8 @@ def _parse_args():
                              help="User to authenticate with the server." )
     arg_parser.add_argument( '-v', '--verbose', dest='verbose', action='store_true', default=False,
                              help="Print debugging logs." )
-    arg_parser.add_argument( '-t', '--timeout', dest='timeout', default=1200.0,
-                             help="Connection timeout." )
+    arg_parser.add_argument( '--poll-interval', dest='poll_interval', default=10, type=int,
+                             help="Seconds between render status checks. Defaults to 10 seconds." )
     return arg_parser.parse_args()
 
 def main():
@@ -95,7 +120,7 @@ def main():
     password = getpass('Password for %s: ' % args.user)
     working_dir = os.path.abspath(os.path.expanduser(args.contentpath))
 
-    remote_render(args.host, args.user, password, working_dir, timeout=float(args.timeout))
+    remote_render(args.host, args.user, password, working_dir, args.poll_interval)
 
 if __name__ == '__main__': # pragma: no cover
         main()
