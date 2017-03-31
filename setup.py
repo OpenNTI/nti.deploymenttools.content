@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 entry_points = {
 	'console_scripts': [
@@ -10,6 +10,7 @@ entry_points = {
 		'build_content_catalog = nti.deploymenttools.content.build_catalog:main',
 		'gc_content_catalog = nti.deploymenttools.content.gc_catalog:main',
 		'nti_update_library = nti.deploymenttools.content.update_library:main',
+		'nti_remote_render = nti.deploymenttools.content.remote_render:main',
 	]
 }
 
