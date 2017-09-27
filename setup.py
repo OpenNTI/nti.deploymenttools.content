@@ -5,10 +5,10 @@ VERSION = '0.2.1'
 
 entry_points = {
 	'console_scripts': [
-		'render_content = nti.deploymenttools.content.render:main',
-		'release_content = nti.deploymenttools.content.release_content:main',
-		'build_content_catalog = nti.deploymenttools.content.build_catalog:main',
-		'gc_content_catalog = nti.deploymenttools.content.gc_catalog:main',
+		'nti_render_content = nti.deploymenttools.content.render:main',
+		'nti_release_content = nti.deploymenttools.content.release_content:main',
+		'nti_build_content_catalog = nti.deploymenttools.content.build_catalog:main',
+		'nti_gc_content_catalog = nti.deploymenttools.content.gc_catalog:main',
 		'nti_update_library = nti.deploymenttools.content.update_library:main',
 		'nti_remote_render = nti.deploymenttools.content.remote_render:main',
 	]
@@ -34,8 +34,8 @@ setup(
 	],
 	install_requires = [
 		'setuptools',
-		'nti.contentrendering',
 		'boto',
+		'nti.contentrendering',
 	],
 	packages = find_packages( 'src' ),
 	package_dir = {'': 'src'},
