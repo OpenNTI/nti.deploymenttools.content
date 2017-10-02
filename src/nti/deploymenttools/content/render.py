@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals, print_function
 
-from . import put_content
-
 import argparse
 import ConfigParser
 import json
@@ -68,38 +66,20 @@ def render_content( content_path ):
 
     return content
 
-DEFAULT_CONFIG_FILE='~/etc/nti_util_conf.ini'
-
 def _parse_args():
     arg_parser = argparse.ArgumentParser( description="NTI Content Renderer" )
     arg_parser.add_argument( 'contentpath', help="Directory containing the content" )
-    arg_parser.add_argument( '-c', '--config', default=DEFAULT_CONFIG_FILE, 
-                             help="Configuration file. The default is: %s" % DEFAULT_CONFIG_FILE )
-    arg_parser.add_argument( '--use-testing', dest='pool', action='store_const', const='testing', default='testing',
-                             help="Add the rendered content to the testing pool." )
-    arg_parser.add_argument( '--use-dev', dest='pool', action='store_const', const='development', default='testing',
-                             help="Add the rendered content to the development pool." )
     return arg_parser.parse_args()
 
 def main():
     # Parse command line args
     args = _parse_args()
-    content_path = os.path.expanduser(args.contentpath)
-
-    # Read the config file
-    configfile = ConfigParser.SafeConfigParser()
-    configfile.read( os.path.expanduser( args.config ) )
+    content_path = os.path.abspath(os.path.expanduser(args.contentpath))
 
     # Build the effective config. This will be important when all of the command line arguments are hooked up.
     config = {}
-    config['content-store'] = configfile.get('local', 'content-store')
 
-    content_list = []
-    new_content = render_content( os.path.abspath(content_path) )
-    if new_content:
-        content_list.append(new_content)
-
-    put_content( config, content_list, dest=args.pool )
+    new_content = render_content( content_path )
 
 if __name__ == '__main__': # pragma: no cover
         main()
