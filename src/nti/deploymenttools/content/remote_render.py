@@ -9,6 +9,8 @@ from time import sleep
 from time import time
 from zipfile import ZipFile
 
+from nti.deploymenttools.content import archive_directory
+
 import json
 import os
 import requests
@@ -25,7 +27,7 @@ logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Remote Render Utility'
 
-def remote_render(host, user, password, working_dir, poll_interval):
+def remote_render(host, user, password, site_library, working_dir, poll_interval):
     def _build_archive(working_dir, temp_dir):
         def _get_job_name(working_dir):
             for file in os.listdir(working_dir):
@@ -37,15 +39,7 @@ def remote_render(host, user, password, working_dir, poll_interval):
 
         job_name = _get_job_name(working_dir)
         archive_path = os.path.join(temp_dir, job_name + '.zip')
-        base_path = os.path.dirname(working_dir) + os.sep
-        with ZipFile(archive_path, 'w') as archive:
-            logger.debug('Creating archive %s' % (archive_path,))
-            for root, dirs, files in os.walk(working_dir):
-                for file in files:
-                    file_path = os.path.join(root,file)
-                    logger.debug('Adding %s to the archive.' % (file_path,))
-                    archive_file_path = file_path.replace(base_path,'')
-                    archive.write(file_path, archive_file_path)
+        archive_directory(working_dir, archive_path)
         return archive_path, job_name
 
     def _monitor_job(response, host, user, password, poll_interval):
@@ -83,8 +77,9 @@ def remote_render(host, user, password, working_dir, poll_interval):
         content_archive, job_name = _build_archive(working_dir, temp_dir)
 
         files = {job_name: open(content_archive, 'rb')}
+        data = { 'site': site_library }
 
-        response = requests.post(url, headers=headers, files=files, auth=(user, password))
+        response = requests.post(url, headers=headers, files=files, data=data, auth=(user, password))
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             _monitor_job(response, host, user, password, poll_interval)
@@ -104,6 +99,8 @@ def _parse_args():
                              help="The remote rendering server." )
     arg_parser.add_argument( '-u', '--user', dest='user',
                              help="User to authenticate with the server." )
+    arg_parser.add_argument( '--site-library', dest='site_library',
+                             help="Site library to add content to. Defaults to the hostname of the destination server." )
     arg_parser.add_argument( '-v', '--verbose', dest='verbose', action='store_true', default=False,
                              help="Print debugging logs." )
     arg_parser.add_argument( '--poll-interval', dest='poll_interval', default=10, type=int,
@@ -113,14 +110,19 @@ def _parse_args():
 def main():
     args = _parse_args()
 
+    site_library = args.site_library or args.host
+
     if args.verbose:
         logger.setLevel(logging.DEBUG)
         log_handler.setLevel(logging.DEBUG)
 
     password = getpass('Password for %s: ' % args.user)
     working_dir = os.path.abspath(os.path.expanduser(args.contentpath))
+    if os.path.isfile(working_dir):
+        working_dir = os.path.dirname(working_dir)
+    logger.info(working_dir)
 
-    remote_render(args.host, args.user, password, working_dir, args.poll_interval)
+    remote_render(args.host, args.user, password, site_library, working_dir, args.poll_interval)
 
 if __name__ == '__main__': # pragma: no cover
         main()
