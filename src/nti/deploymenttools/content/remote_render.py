@@ -1,28 +1,24 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals, print_function
+from __future__ import print_function
 
 from argparse import ArgumentParser
 from getpass import getpass
+from shutil import rmtree
 from tempfile import mkdtemp
 from time import sleep
 from time import time
 from zipfile import ZipFile
 
 from nti.deploymenttools.content import archive_directory
+from nti.deploymenttools.content import configure_logging
 
 import json
+import logging
 import os
 import requests
-import shutil
 
-import logging
 logger = logging.getLogger('nti_remote_render')
-logger.setLevel(logging.INFO)
-log_handler = logging.StreamHandler()
-log_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
-log_handler.setLevel(logging.INFO)
-logger.addHandler(log_handler)
 logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Remote Render Utility'
@@ -89,7 +85,7 @@ def remote_render(host, user, password, site_library, working_dir, poll_interval
         logger.warning('No response from %s in %s seconds while attempting to render %s.' % (host, timeout, working_dir))
     finally:
         if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)
+            rmtree(temp_dir)
 
 def _parse_args():
     # Parse command line args
@@ -101,8 +97,10 @@ def _parse_args():
                              help="User to authenticate with the server." )
     arg_parser.add_argument( '--site-library', dest='site_library',
                              help="Site library to add content to. Defaults to the hostname of the destination server." )
-    arg_parser.add_argument( '-v', '--verbose', dest='verbose', action='store_true', default=False,
+    arg_parser.add_argument( '-v', '--verbose', dest='loglevel', action='store_const', const=logging.DEBUG,
                              help="Print debugging logs." )
+    arg_parser.add_argument( '-q', '--quiet', dest='loglevel', action='store_const', const=logging.WARNING,
+                             help="Print warning and error logs only." )
     arg_parser.add_argument( '--poll-interval', dest='poll_interval', default=10, type=int,
                              help="Seconds between render status checks. Defaults to 10 seconds." )
     return arg_parser.parse_args()
@@ -112,11 +110,10 @@ def main():
 
     site_library = args.site_library or args.host
 
-    if args.verbose:
-        logger.setLevel(logging.DEBUG)
-        log_handler.setLevel(logging.DEBUG)
+    loglevel = args.loglevel or logging.INFO
+    configure_logging(level=loglevel)
 
-    password = getpass('Password for %s: ' % args.user)
+    password = getpass('Password for %s@%s: ' % (args.user, args.host))
     working_dir = os.path.abspath(os.path.expanduser(args.contentpath))
     if os.path.isfile(working_dir):
         working_dir = os.path.dirname(working_dir)

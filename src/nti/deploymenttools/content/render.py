@@ -8,8 +8,9 @@ from shutil import rmtree
 from socket import gethostname
 from time import strftime
 
-from nti.contentrendering import nti_render
+from nti.contentrendering.nti_render import render
 from nti.deploymenttools.content import archive_directory
+from nti.deploymenttools.content import configure_logging
 from nti.deploymenttools.content import upload_rendered_content
 
 import logging
@@ -35,7 +36,7 @@ def render_content( content_path, host, username, password, site_library, cleanu
     try:
         logger.info( 'Rendering %s' % os.path.basename(content_path) )
         # Render the content
-        nti_render.render( os.path.basename(content_path), out_format='xhtml', nochecking=False)
+        render( os.path.basename(content_path), out_format='xhtml', nochecking=False)
 
         # Work around for nti_render.render not returning you to the original
         # working directory.
@@ -87,10 +88,9 @@ def main():
     site_library = args.site_library or args.host
 
     loglevel = args.loglevel or logging.INFO
-    logger.setLevel(loglevel)
-    nti_render.configure_logging(level=logging.getLevelName(loglevel))
+    configure_logging(level=loglevel)
 
-    password = getpass('Password for %s@%s: ' % (args.user,args.host))
+    password = getpass('Password for %s@%s: ' % (args.user, args.host))
 
     render_content( content_path, args.host, args.user, password, site_library, cleanup=args.no_cleanup )
 
