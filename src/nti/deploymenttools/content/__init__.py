@@ -1,4 +1,5 @@
 from zipfile import ZipFile
+from zope.exceptions.log import Formatter as ZopeLogFormatter
 
 import logging
 import os
@@ -34,3 +35,9 @@ def upload_rendered_content( content, host, username, password, site_library, ua
     if response.status_code == requests.codes.ok:
         logger.info('Render sucessfully uploaded.')
 
+DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
+
+def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
+    level = logging.INFO if not isinstance(level, int) else level
+    logging.basicConfig(level=level)
+    logging.root.handlers[0].setFormatter(ZopeLogFormatter(fmt))
