@@ -5,8 +5,6 @@ from __future__ import print_function
 from argparse import ArgumentParser
 from getpass import getpass
 from shutil import rmtree
-from socket import gethostname
-from time import strftime
 
 from nti.contentrendering.nti_render import render
 from nti.deploymenttools.content import archive_directory
