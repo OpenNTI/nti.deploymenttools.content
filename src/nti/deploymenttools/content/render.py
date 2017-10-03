@@ -1,19 +1,26 @@
 #!/usr/bin/env python
 
-from __future__ import unicode_literals, print_function
+from __future__ import print_function
 
-import argparse
-import ConfigParser
-import json
+from argparse import ArgumentParser
+from getpass import getpass
+from shutil import rmtree
+from socket import gethostname
+from time import strftime
+
+from nti.contentrendering import nti_render
+from nti.deploymenttools.content import archive_directory
+from nti.deploymenttools.content import upload_rendered_content
+
+import logging
 import os
-import socket
-import shutil
-import subprocess
-import tarfile
-import tempfile
-import time
 
-def render_content( content_path ):
+logger = logging.getLogger('nti_render_content')
+logging.captureWarnings(True)
+
+UA_STRING = 'NextThought Local Render Utility'
+
+def render_content( content_path, host, username, password, site_library, cleanup=True ):
     content_name = os.path.basename( os.path.splitext( content_path )[0] )
 
     # Save the current working directory
@@ -21,54 +28,55 @@ def render_content( content_path ):
     # Change CWD to the content directory
     os.chdir( os.path.dirname( content_path ) )
 
+    # Build output archive name
+    filename = '.'.join( [ content_name, 'zip' ] )
+    content_archive = os.path.abspath( os.path.join( os.path.dirname( content_path ), filename ) )
+
     try:
+        logger.info( 'Rendering %s' % os.path.basename(content_path) )
         # Render the content
-        print( 'Rendering %s' % os.path.basename(content_path) )
-        cmd = [ 'nti_render', os.path.basename(content_path) ]
-        subprocess.check_call( cmd )
+        nti_render.render( os.path.basename(content_path), out_format='xhtml', nochecking=False)
 
-        timestamp = time.strftime('%Y%m%d%H%M%S')
+        # Work around for nti_render.render not returning you to the original
+        # working directory.
+        os.chdir( os.path.dirname( content_path ) )
 
-        content = { 'name': content_name,
-                    'builder': socket.gethostname().split('.')[0].replace('-','_'),
-                    'indexer': socket.gethostname().split('.')[0].replace('-','_'),
-                    'version': timestamp,
-                    'build_time': timestamp,
-                    'index_time': timestamp }
+        logger.info( 'Building content archive' )
+        archive_directory(content_name, content_archive)
 
-        # Write content_info to .version
-        with open( os.path.join( content_name, '.version' ), 'wb' ) as file:
-            json.dump( content, file )
-
-        # Build content archive
-        print( 'Building content archive' )
-        filename = '.'.join( [ '-'.join( [ content['name'], content['builder'], content['version'] ] ), 'tgz' ] )
-        # Open the archive for writing and add the content to it
-        with tarfile.open( name=filename, mode = 'w:gz' ) as archive:
-            archive.add( content_name )
-
-        content['archive'] = os.path.abspath( os.path.join( os.path.dirname( content_path ), filename ) )
-
-    except subprocess.CalledProcessError:
-        print("Failed to render %s" % content_name )
-        content = None
+        logger.info('Uploading render of %s to %s' % (content_name, host))
+        upload_rendered_content( content_archive, host, username, password, site_library, UA_STRING )
 
     finally:
         # Clean-up
-        if os.path.exists( '.'.join( [ content_name , 'paux' ] ) ):
-            os.remove( '.'.join( [ content_name , 'paux' ] ) )
+        if cleanup:
+            if os.path.exists( '.'.join( [ content_name , 'paux' ] ) ):
+                os.remove( '.'.join( [ content_name , 'paux' ] ) )
 
-        if os.path.exists( content_name ):
-            shutil.rmtree( content_name )
+            if os.path.exists( content_archive ):
+                os.remove( content_archive )
+
+            if os.path.exists( content_name ):
+                rmtree( content_name )
 
         # Restore the original CWD
         os.chdir( old_cwd )
 
-    return content
-
 def _parse_args():
-    arg_parser = argparse.ArgumentParser( description="NTI Content Renderer" )
-    arg_parser.add_argument( 'contentpath', help="Directory containing the content" )
+    arg_parser = ArgumentParser( description=UA_STRING )
+    arg_parser.add_argument( 'contentpath', help="Content driver file to render" )
+    arg_parser.add_argument( '-s', '--server', dest='host',
+                             help="Destination server for uploaded rendered content." )
+    arg_parser.add_argument( '-u', '--user', dest='user',
+                             help="User to authenticate with the server." )
+    arg_parser.add_argument( '--site-library', dest='site_library',
+                             help="Site library to add content to. Defaults to the hostname of the destination server." )
+    arg_parser.add_argument( '-v', '--verbose', dest='loglevel', action='store_const', const=logging.DEBUG,
+                             help="Print debugging logs." )
+    arg_parser.add_argument( '-q', '--quiet', dest='loglevel', action='store_const', const=logging.WARNING,
+                             help="Print warning and error logs only." )
+    arg_parser.add_argument( '--no-cleanup', dest='no_cleanup', action='store_false', default=True,
+                             help="Do not cleanup process files." )
     return arg_parser.parse_args()
 
 def main():
@@ -76,10 +84,15 @@ def main():
     args = _parse_args()
     content_path = os.path.abspath(os.path.expanduser(args.contentpath))
 
-    # Build the effective config. This will be important when all of the command line arguments are hooked up.
-    config = {}
+    site_library = args.site_library or args.host
 
-    new_content = render_content( content_path )
+    loglevel = args.loglevel or logging.INFO
+    logger.setLevel(loglevel)
+    nti_render.configure_logging(level=logging.getLevelName(loglevel))
+
+    password = getpass('Password for %s@%s: ' % (args.user,args.host))
+
+    render_content( content_path, args.host, args.user, password, site_library, cleanup=args.no_cleanup )
 
 if __name__ == '__main__': # pragma: no cover
         main()
