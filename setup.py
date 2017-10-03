@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-VERSION = '1.0.0-rc1'
+VERSION = '1.0.0rc1'
 
 entry_points = {
 	'console_scripts': [
