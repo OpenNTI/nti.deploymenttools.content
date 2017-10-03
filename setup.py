@@ -5,6 +5,7 @@ VERSION = '1.0.0-rc1'
 
 entry_points = {
 	'console_scripts': [
+		'nti_copy_content_package = nti.deploymenttools.content.copy_content_package:main',
 		'nti_render_content = nti.deploymenttools.content.render:main',
 		'nti_remote_render = nti.deploymenttools.content.remote_render:main',
 	]
