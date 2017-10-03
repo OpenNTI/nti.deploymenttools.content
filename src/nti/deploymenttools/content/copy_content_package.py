@@ -25,6 +25,8 @@ def copy_content_package(content_ntiid, source_host, dest_host, username, site_l
         logger.info("Uploading content package to %s" % (dest_host,))
         password = getpass('Password for %s@%s: ' % (username, dest_host))
         upload_rendered_content( content_archive, dest_host, username, password, site_library, UA_STRING )
+    except requests.exceptions.HTTPError as e:
+        logger.error(e)
     finally:
         # Clean-up
         if cleanup:
@@ -55,12 +57,12 @@ def main():
     # Parse command line args
     args = _parse_args()
 
-    site_library = args.site_library or args.host
+    site_library = args.site_library or args.dest_host
 
     loglevel = args.loglevel or logging.INFO
     configure_logging(level=loglevel)
 
-    copy_content_package( content_ntiid, args.source_host, args.dest_host, args.user, site_library, cleanup=args.no_cleanup )
+    copy_content_package( args.content_ntiid, args.source_host, args.dest_host, args.user, site_library, cleanup=args.no_cleanup )
 
 if __name__ == '__main__': # pragma: no cover
         main()
