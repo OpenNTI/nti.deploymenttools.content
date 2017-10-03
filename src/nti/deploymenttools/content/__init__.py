@@ -35,6 +35,24 @@ def upload_rendered_content( content, host, username, password, site_library, ua
     if response.status_code == requests.codes.ok:
         logger.info('Render sucessfully uploaded.')
 
+CHUNK_SIZE=1024*1024
+
+def download_rendered_content( content_ntiid, host, username, password, ua_string ):
+    url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, content_ntiid)
+    headers = {
+        'user-agent': ua_string
+    }
+
+    content_archive = '.'.join( [ content_ntiid, 'zip'] )
+    response = requests.get(url, stream=True, headers=headers, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests.codes.ok:
+        with open(content_archive, 'wb') as archive:
+            for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                if chunk:
+                    archive.write(chunk)
+        return content_archive
+
 DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
 
 def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
