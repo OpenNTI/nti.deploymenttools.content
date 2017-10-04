@@ -1,7 +1,17 @@
-# Ignore the Python egg info data
+*.py[cod]
+
+/.project
+/.pydevproject
+/.settings/
+
+*.DS_Store
+
+# Distribution / packaging
+build/
+dist/
+/.tox/
 nti.deploymenttools.content.egg-info
 
-# Ignore directories created by distutils
-build
-dist
-
+.coverage
+htmlcov/
+docs/_build/
