@@ -20,20 +20,14 @@ def archive_directory( path, archive_path ):
                 logger.debug('Adding %s to the archive as %s.' % (file_path, archive_file_path))
                 archive.write(file_path, archive_file_path)
 
-def upload_rendered_content( content, host, username, password, site_library, ua_string ):
-    url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
-    headers = {
-        'user-agent': ua_string
-    }
 
-    files = {'data': open(content, 'rb')}
+DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
 
-    data = { 'site': site_library }
+def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
+    level = logging.INFO if not isinstance(level, int) else level
+    logging.basicConfig(level=level)
+    logging.root.handlers[0].setFormatter(ZopeLogFormatter(fmt))
 
-    response = requests.post(url, headers=headers, files=files, data=data, auth=(username, password))
-    response.raise_for_status()
-    if response.status_code == requests.codes.ok:
-        logger.info('Render sucessfully uploaded.')
 
 CHUNK_SIZE=1024*1024
 
@@ -53,9 +47,18 @@ def download_rendered_content( content_ntiid, host, username, password, ua_strin
                     archive.write(chunk)
         return content_archive
 
-DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
 
-def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
-    level = logging.INFO if not isinstance(level, int) else level
-    logging.basicConfig(level=level)
-    logging.root.handlers[0].setFormatter(ZopeLogFormatter(fmt))
+def upload_rendered_content( content, host, username, password, site_library, ua_string ):
+    url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
+    headers = {
+        'user-agent': ua_string
+    }
+
+    files = {'data': open(content, 'rb')}
+
+    data = { 'site': site_library }
+
+    response = requests.post(url, headers=headers, files=files, data=data, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests.codes.ok:
+        logger.info('Render sucessfully uploaded.')
