@@ -21,7 +21,7 @@ logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Remote Render Utility'
 
-def remote_render(host, user, password, site_library, working_dir, poll_interval):
+def remote_render(host, user, password, site_library, working_dir, poll_interval, cleanup=True ):
     def _build_archive(working_dir, temp_dir):
         def _get_job_name(working_dir):
             for file in os.listdir(working_dir):
@@ -68,6 +68,7 @@ def remote_render(host, user, password, site_library, working_dir, poll_interval
     logger.info('Submitting render of %s to %s' % (working_dir, host))
     try:
         temp_dir = mkdtemp()
+        logger.info('Using %s to store temporary files' % (temp_dir,))
         content_archive, job_name = _build_archive(working_dir, temp_dir)
 
         files = {job_name: open(content_archive, 'rb')}
@@ -82,8 +83,10 @@ def remote_render(host, user, password, site_library, working_dir, poll_interval
     except requests.exceptions.ReadTimeout as e:
         logger.warning('No response from %s in %s seconds while attempting to render %s.' % (host, timeout, working_dir))
     finally:
-        if os.path.exists(temp_dir):
-            rmtree(temp_dir)
+        # Clean-up
+        if cleanup:
+            if os.path.exists(temp_dir):
+                rmtree(temp_dir)
 
 def _parse_args():
     # Parse command line args
@@ -101,6 +104,8 @@ def _parse_args():
                              help="Print warning and error logs only." )
     arg_parser.add_argument( '--poll-interval', dest='poll_interval', default=10, type=int,
                              help="Seconds between render status checks. Defaults to 10 seconds." )
+    arg_parser.add_argument( '--no-cleanup', dest='cleanup', action='store_false', default=True,
+                             help="Do not cleanup process files." )
     return arg_parser.parse_args()
 
 def main():
@@ -117,7 +122,7 @@ def main():
         working_dir = os.path.dirname(working_dir)
     logger.info(working_dir)
 
-    remote_render(args.host, args.user, password, site_library, working_dir, args.poll_interval)
+    remote_render(args.host, args.user, password, site_library, working_dir, args.poll_interval, cleanup=args.cleanup)
 
 if __name__ == '__main__': # pragma: no cover
         main()
