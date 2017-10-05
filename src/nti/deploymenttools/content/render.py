@@ -42,7 +42,8 @@ def render_content( content_path, host, username, password, site_library, cleanu
         archive_directory(content_name, content_archive)
 
         logger.info('Uploading render of %s to %s' % (content_name, host))
-        upload_rendered_content( content_archive, host, username, password, site_library, UA_STRING )
+        content = upload_rendered_content( content_archive, host, username, password, site_library, UA_STRING )
+        logger.info('Successfully uploaded as %s' % (content['Items'].keys()[0],))
 
     finally:
         # Clean-up

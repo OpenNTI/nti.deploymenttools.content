@@ -100,7 +100,9 @@ def copy_course(course_ntiid, source_host, dest_host, username, site_library, ad
 
         # TODO: Check if admin level exists on dest server, if not, create it.
         logger.info("Importing %s to %s" % (course_ntiid, dest_host))
-        import_course( course_archive, dest_host, username, password, site_library, admin_level, provider_id, UA_STRING)
+        course = import_course( course_archive, dest_host, username, password, site_library, admin_level, provider_id, UA_STRING)
+        logger.info('Course imported sucessfully as %s.' % (course['Course']['NTIID'],))
+        
 
     except requests.exceptions.HTTPError as e:
         logger.error(e)

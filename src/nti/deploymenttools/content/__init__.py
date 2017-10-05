@@ -87,9 +87,7 @@ def import_course( course, host, username, password, site_library, admin_level, 
     response = requests.post(url, headers=headers, files=files, data=data, auth=(username, password))
     response.raise_for_status()
     if response.status_code == requests.codes.ok:
-        course_data = response.json()
-        ntiid = course_data['Course']['NTIID']
-        logger.info('Course imported sucessfully as %s.' % (ntiid,))
+        return response.json()
 
 
 def upload_rendered_content( content, host, username, password, site_library, ua_string ):
@@ -105,4 +103,4 @@ def upload_rendered_content( content, host, username, password, site_library, ua
     response = requests.post(url, headers=headers, files=files, data=data, auth=(username, password))
     response.raise_for_status()
     if response.status_code == requests.codes.ok:
-        logger.info('Render sucessfully uploaded.')
+        return response.json()

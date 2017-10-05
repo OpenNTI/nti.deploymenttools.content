@@ -24,7 +24,8 @@ def copy_content_package(content_ntiid, source_host, dest_host, username, site_l
 
         logger.info("Uploading content package to %s" % (dest_host,))
         password = getpass('Password for %s@%s: ' % (username, dest_host))
-        upload_rendered_content( content_archive, dest_host, username, password, site_library, UA_STRING )
+        content = upload_rendered_content( content_archive, dest_host, username, password, site_library, UA_STRING )
+        logger.info('Successfully uploaded as %s' % (content['Items'].keys()[0],))
     except requests.exceptions.HTTPError as e:
         logger.error(e)
     finally:
