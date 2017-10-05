@@ -4,6 +4,7 @@ from zope.exceptions.log import Formatter as ZopeLogFormatter
 import logging
 import os
 import requests
+import simplejson as json
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,49 @@ def download_rendered_content( content_ntiid, host, username, password, ua_strin
                 if chunk:
                     archive.write(chunk)
         return content_archive
+
+
+def export_course( course_ntiid, host, username, password, ua_string, backup=False ):
+    url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, course_ntiid)
+    headers = {
+        'user-agent': ua_string,
+        'Content-Type': 'application/json'
+    }
+
+    body = {
+        'backup': backup
+    }
+
+    course_archive = '.'.join( [ course_ntiid, 'zip'] )
+    response = requests.get(url, stream=True, headers=headers, data=json.dumps(body), auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests.codes.ok:
+        with open(course_archive, 'wb') as archive:
+            for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                if chunk:
+                    archive.write(chunk)
+        return course_archive
+
+def import_course( course, host, username, password, site_library, admin_level, provider_id, ua_string ):
+    url = 'https://%s/dataserver2/CourseAdmin/@@ImportCourse' % host
+    headers = {
+        'user-agent': ua_string
+    }
+
+    files = {'data': open(course, 'rb')}
+
+    data = { 
+        'admin': admin_level,
+        'key': provider_id,
+        'site': site_library 
+    }
+
+    response = requests.post(url, headers=headers, files=files, data=data, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests.codes.ok:
+        course_data = response.json()
+        ntiid = course_data['Course']['NTIID']
+        logger.info('Course imported sucessfully as %s.' % (ntiid,))
 
 
 def upload_rendered_content( content, host, username, password, site_library, ua_string ):
