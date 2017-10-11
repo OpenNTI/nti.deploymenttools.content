@@ -17,7 +17,7 @@ def archive_directory( path, archive_path ):
         for root, dirs, files in os.walk(path):
             for file in files:
                 file_path = os.path.join(root,file)
-                archive_file_path = file_path.replace(base_path,'')
+                archive_file_path = file_path.replace(base_path,'',1)
                 logger.debug('Adding %s to the archive as %s.' % (file_path, archive_file_path))
                 archive.write(file_path, archive_file_path)
 
