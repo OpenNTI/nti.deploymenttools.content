@@ -90,6 +90,21 @@ def import_course( course, host, username, password, site_library, admin_level, 
         return response.json()
 
 
+def restore_course( course, host, username, password, ua_string ):
+    ntiid = os.path.splitext(os.path.basename(course))[0]
+    url = 'https://%s/dataserver2/Objects/%s/@@Import' % (host,ntiid)
+    headers = {
+        'user-agent': ua_string
+    }
+
+    files = {'data': open(course, 'rb')}
+
+    response = requests.post(url, headers=headers, files=files, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests.codes.ok:
+        return response.json()
+
+
 def upload_rendered_content( content, host, username, password, site_library, ua_string ):
     url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
     headers = {
