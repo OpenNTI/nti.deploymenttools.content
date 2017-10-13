@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 from getpass import getpass
+from requests import requests.exceptions as requests_exceptions
 
 from nti.deploymenttools.content import configure_logging
 from nti.deploymenttools.content import download_rendered_content
@@ -26,7 +27,7 @@ def copy_content_package(content_ntiid, source_host, dest_host, username, site_l
         password = getpass('Password for %s@%s: ' % (username, dest_host))
         content = upload_rendered_content( content_archive, dest_host, username, password, site_library, UA_STRING )
         logger.info('Successfully uploaded as %s' % (content['Items'].keys()[0],))
-    except requests.exceptions.HTTPError as e:
+    except requests_exceptions.HTTPError as e:
         logger.error(e)
     finally:
         # Clean-up
