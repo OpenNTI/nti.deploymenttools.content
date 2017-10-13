@@ -53,7 +53,10 @@ setup(
         'setuptools',
         'boto',
         'nti.contentrendering',
+        'requests',
+        'simplejson',
         'six',
+        'zope.exceptions',
     ],
     extras_require={
         'test': TESTS_REQUIRE,
