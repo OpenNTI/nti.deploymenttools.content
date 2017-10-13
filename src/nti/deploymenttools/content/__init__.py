@@ -114,8 +114,7 @@ def import_course(course, host, username, password, site_library, admin_level, p
         return response.json()
 
 
-def restore_course(course, host, username, password, ua_string):
-    ntiid = os.path.splitext(os.path.basename(course))[0]
+def restore_course(course, host, username, password, ntiid, ua_string):
     url = 'https://%s/dataserver2/Objects/%s/@@Import' % (host, ntiid)
     headers = {
         'user-agent': ua_string
