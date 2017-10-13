@@ -2,7 +2,7 @@
 
 from argparse import ArgumentParser
 from getpass import getpass
-from requests import requests.exceptions as requests_exceptions
+from requests import exceptions as requests_exceptions
 
 from nti.deploymenttools.content import configure_logging
 from nti.deploymenttools.content import download_rendered_content
