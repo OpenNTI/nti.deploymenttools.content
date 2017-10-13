@@ -103,7 +103,8 @@ def import_course(course, host, username, password, site_library, admin_level, p
     data = {
         'admin': admin_level,
         'key': provider_id,
-        'site': site_library
+        'site': site_library,
+        'writeout': "True"
     }
 
     response = requests.post(url, headers=headers,
@@ -137,7 +138,10 @@ def upload_rendered_content(content, host, username, password, site_library, ua_
 
     files = {'data': open(content, 'rb')}
 
-    data = {'site': site_library}
+    data = {
+        'obfuscate': True,
+        'site': site_library
+    }
 
     response = requests.post(url, headers=headers,
                              files=files, data=data, auth=(username, password))
