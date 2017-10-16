@@ -40,7 +40,7 @@ def _get_content_packages(course_archive):
     with ZipFile(course_archive, 'r') as archive:
         bundle_metadata = json.load(archive.open('bundle_meta_info.json'))
         content_packages = bundle_metadata['ContentPackages']
-    return content_packages
+    return content_packages or ()
 
 
 def _get_provider_id(course_archive):
