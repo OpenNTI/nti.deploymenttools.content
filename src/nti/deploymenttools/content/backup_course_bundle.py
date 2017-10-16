@@ -65,7 +65,7 @@ def main():
     backup_course(args.ntiid,
                   args.source_host,
                   args.user,
-                  cleanup=args.no_cleanup)
+                  args.no_cleanup)
 
 
 if __name__ == '__main__':  # pragma: no cover
