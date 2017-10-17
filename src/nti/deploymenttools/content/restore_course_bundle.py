@@ -10,7 +10,7 @@ import logging
 import os
 import requests
 
-logger = logging.getLogger('nti_restore_course')
+logger = __import__('logging').getLogger(__name__)
 logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Course Restore Utility'
