@@ -122,6 +122,10 @@ def restore_course(course, host, username, password, ntiid, ua_string):
 
     files = {'data': open(course, 'rb')}
 
+    data = {
+        'writeout': "True"
+    }
+
     response = requests.post(url, headers=headers,
                              files=files, auth=(username, password))
     response.raise_for_status()
