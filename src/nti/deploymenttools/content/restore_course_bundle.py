@@ -43,9 +43,9 @@ def main():
     configure_logging(level=loglevel)
 
     try:
-        password = getpass('Password for %s@%s: ' % (args.username, args.dest_host))
+        password = getpass('Password for %s@%s: ' % (args.user, args.dest_host))
         logger.info("Restoring course from %s to %s" % (course_archive, args.dest_host))
-        course = restore_course( course_archive, args.dest_host, args.username, password, args.ntiid, UA_STRING)
+        course = restore_course( course_archive, args.dest_host, args.user, password, args.ntiid, UA_STRING)
         logger.info('Course restored sucessfully as %s.' % (course['Course']['NTIID'],))
 
     except requests.exceptions.HTTPError as e:
