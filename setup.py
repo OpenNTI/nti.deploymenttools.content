@@ -6,6 +6,7 @@ entry_points = {
         'nti_backup_course = nti.deploymenttools.content.backup_course_bundle:main',
         'nti_copy_content_package = nti.deploymenttools.content.copy_content_package:main',
         'nti_copy_course = nti.deploymenttools.content.copy_course:main',
+        'nti_manage_course = nti.deploymenttools.content.manage_course:main',
         'nti_remote_render = nti.deploymenttools.content.remote_render:main',
         'nti_render_content = nti.deploymenttools.content.render:main',
         'nti_restore_course = nti.deploymenttools.content.restore_course_bundle:main',
