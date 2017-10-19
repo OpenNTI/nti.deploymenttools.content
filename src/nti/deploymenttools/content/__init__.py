@@ -72,8 +72,7 @@ def download_rendered_content(content_ntiid, host, username, password, ua_string
 def export_course(course_ntiid, host, username, password, ua_string, backup=False):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, course_ntiid)
     headers = {
-        'user-agent': ua_string,
-        'Content-Type': 'application/json'
+        'user-agent': ua_string
     }
 
     body = {
@@ -82,7 +81,7 @@ def export_course(course_ntiid, host, username, password, ua_string, backup=Fals
 
     course_archive = '.'.join([course_ntiid, 'zip'])
     response = requests.get(url, stream=True, headers=headers,
-                            data=json.dumps(body), auth=(username, password))
+                            params=body, auth=(username, password))
     response.raise_for_status()
     if response.status_code == requests_codes.ok:
         with open(course_archive, 'wb') as archive:
