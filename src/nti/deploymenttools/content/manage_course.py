@@ -159,20 +159,24 @@ def _update_course_archive(course_archive, **kwargs):
 
         for key in kwargs:
             if key == 'asset_path':
+                logger.debug('Clearing old presentation assets')
                 _remove_path(os.path.join(temp_dir,'presentation-assets'))
             if key == 'discussion_paths':
                 discussion_dir = os.path.join(temp_dir, 'Discussions')
                 if not os.path.exists(discussion_dir):
                     os.mkdir(discussion_dir)
                 for path in kwargs[key]:
-                    path = os.path.abspath(os.path.expanduser(path))
+                    logger.debug('Copying %s to %s', path, discussion_dir)
                     copy2(path, discussion_dir)
             if key == 'metadata_path':
-                metadata_path = os.path.abspath(os.path.expanduser(kwargs[key]))
+                metadata_path = kwargs[key]
                 for path in ['bundle_dc_metadata.xml', 'dc_metadata.xml']:
+                    logger.debug('Copying %s to %s', metadata_path,
+                                 os.path.join(temp_dir, path))
                     copy2(metadata_path,os.path.join(temp_dir, path))
             if key == 'vendor_path':
-                vendor_path = os.path.abspath(os.path.expanduser(kwargs[key]))
+                vendor_path = kwargs[key]
+                logger.debug('Copying %s to %s', vendor_path, temp_dir)
                 copy2(vendor_path,temp_dir)
 
         archive_directory(temp_dir, modified_course_archive)
@@ -182,7 +186,8 @@ def _update_course_archive(course_archive, **kwargs):
     with ZipFile(modified_course_archive, 'a') as archive:
         for key in kwargs:
             if key == 'asset_path':
-                asset_path = os.path.abspath(os.path.expanduser(kwargs[key])) + '/'
+                asset_path = kwargs[key] + '/'
+                logger.debug('Adding presentation assets from %s', asset_path)
                 for root, _, files in os.walk(asset_path):
                     for source in files or ():
                         file_path = os.path.join(root, source)
@@ -280,33 +285,39 @@ def main():
     if args.subparser_name == 'dcmetadata':
         if args.file:
             try:
+                metadata_path = os.path.abspath(os.path.expanduser(args.file))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
-                              UA_STRING, metadata_path=args.file)
+                              UA_STRING, metadata_path=metadata_path)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
     elif args.subparser_name == 'discussions':
         if args.discussions:
             try:
+                discussions = []
+                for path in args.discussions:
+                    discussions.append(os.path.abspath(os.path.expanduser(path)))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
-                              UA_STRING, discussion_paths=args.discussions)
+                              UA_STRING, discussion_paths=discussions)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
     elif args.subparser_name == 'presentationassets':
         if args.file:
             try:
+                asset_path = os.path.abspath(os.path.expanduser(args.file))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
-                              UA_STRING, asset_path=args.file)
+                              UA_STRING, asset_path=asset_path)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
     elif args.subparser_name == 'vendorinfo':
         if args.file:
             try:
+                vendor_path = os.path.abspath(os.path.expanduser(args.file))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
-                              UA_STRING, vendor_path=args.file)
+                              UA_STRING, vendor_path=vendor_path)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
 
