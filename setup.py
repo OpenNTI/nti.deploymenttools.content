@@ -54,6 +54,7 @@ setup(
     install_requires=[
         'setuptools',
         'boto',
+        'isodate',
         'nti.contentrendering',
         'requests',
         'simplejson',
