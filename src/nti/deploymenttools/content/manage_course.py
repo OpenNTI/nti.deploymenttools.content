@@ -33,6 +33,7 @@ requests_codes = requests.codes
 UA_STRING = 'NextThought Course Management Utility'
 
 logger = __import__('logging').getLogger(__name__)
+logging.captureWarnings(True)
 
 
 def _remove_path(path):
