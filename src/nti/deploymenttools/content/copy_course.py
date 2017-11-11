@@ -31,7 +31,6 @@ from nti.deploymenttools.content import upload_rendered_content
 from nti.deploymenttools.content import download_rendered_content
 
 logger = __import__('logging').getLogger(__name__)
-logging.captureWarnings(True)
 
 UA_STRING = 'NextThought Course Copy Utility'
 
@@ -137,7 +136,7 @@ def copy_course(course_ntiid, source_host, dest_host, username, site_library,
             _remove_path(working_dir)
 
 
-def _parse_args():
+def _parse_args(args=None):
     arg_parser = ArgumentParser(description=UA_STRING)
     arg_parser.add_argument('-n', '--ntiid', dest='ntiid',
                             help="NTIID of the course to copy.")
@@ -168,12 +167,11 @@ def _parse_args():
     arg_parser.add_argument('--no-cleanup', dest='no_cleanup', action='store_false',
                             default=True,
                             help="Do not cleanup process files.")
-    return arg_parser.parse_args()
+    return arg_parser.parse_args(args)
 
 
-def main():
-    # Parse command line args
-    args = _parse_args()
+def main(args=None):
+    args = _parse_args(args)
 
     site_library = args.site_library or args.dest_host
 
