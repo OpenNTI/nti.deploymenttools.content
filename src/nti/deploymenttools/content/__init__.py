@@ -9,7 +9,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+import shutil
 import logging
+import tempfile
 from zipfile import ZipFile
 
 import requests
@@ -21,19 +23,17 @@ logger = __import__('logging').getLogger(__name__)
 requests_codes = requests.codes
 
 
-def archive_directory(path, archive_path):
-    base_path = path + os.sep
-    logger.debug(base_path)
-
-    with ZipFile(archive_path, 'w') as archive:
+def archive_directory(source_path, archive_path):
+    if not os.path.isdir(source_path):
+        raise ValueError("Invalid source path")
+    logger.debug("Archiving %s", source_path)
+    filename = tempfile.mktemp()
+    try:
+        shutil.make_archive(filename, "zip", source_path)
+    finally:
         logger.debug('Creating archive %s' % (archive_path,))
-        for root, _, files in os.walk(path):
-            for source in files or ():
-                file_path = os.path.join(root, source)
-                archive_file_path = file_path.replace(base_path, '', 1)
-                logger.debug('Adding %s to the archive as %s.' %
-                             (file_path, archive_file_path))
-                archive.write(file_path, archive_file_path)
+        shutil.move(filename + ".zip", archive_path)
+    return archive_path
 
 
 DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
