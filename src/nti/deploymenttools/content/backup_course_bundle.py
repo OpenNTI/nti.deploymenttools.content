@@ -36,7 +36,7 @@ def backup_course(course_ntiid, source_host, username, unused_cleanup=True):
         logger.error(e)
 
 
-def _parse_args():
+def _parse_args(args=None):
     arg_parser = ArgumentParser(description=UA_STRING)
     arg_parser.add_argument('-n', '--ntiid', dest='ntiid',
                             help="NTIID of the course to copy.")
@@ -52,12 +52,12 @@ def _parse_args():
     arg_parser.add_argument('--no-cleanup', dest='no_cleanup', action='store_false', 
                             default=True,
                             help="Do not cleanup process files.")
-    return arg_parser.parse_args()
+    return arg_parser.parse_args(args)
 
 
-def main():
+def main(args=None):
     # Parse command line args
-    args = _parse_args()
+    args = _parse_args(args)
 
     loglevel = args.loglevel or logging.INFO
     configure_logging(level=loglevel)
