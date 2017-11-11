@@ -10,9 +10,12 @@ from __future__ import absolute_import
 
 import os
 import logging
-from zipfile import ZipFile
 
 import requests
+
+import simplejson as json
+
+from zipfile import ZipFile
 
 from zope.exceptions.log import Formatter as ZopeLogFormatter
 
@@ -53,6 +56,7 @@ def download_rendered_content(content_ntiid, host, username, password, ua_string
     headers = {
         'user-agent': ua_string
     }
+
     content_archive = '.'.join([content_ntiid, 'zip'])
     response = requests.get(url, stream=True, headers=headers,
                             auth=(username, password))
@@ -70,9 +74,11 @@ def export_course(course_ntiid, host, username, password, ua_string, backup=Fals
     headers = {
         'user-agent': ua_string
     }
+
     body = {
         'backup': backup
     }
+
     course_archive = '.'.join([course_ntiid, 'zip'])
     response = requests.get(url, stream=True, headers=headers,
                             params=body, auth=(username, password))
@@ -85,26 +91,26 @@ def export_course(course_ntiid, host, username, password, ua_string, backup=Fals
         return course_archive
 
 
-def import_course(course, host, username, password, site_library, 
-                  admin_level, provider_id, ua_string):
+def import_course(course, host, username, password, site_library, admin_level, provider_id, ua_string):
     url = 'https://%s/dataserver2/CourseAdmin/@@ImportCourse' % host
     headers = {
         'user-agent': ua_string
     }
-    with open(course, "rb") as fp:
-        files = {'data': fp}
-        data = {
-            'admin': admin_level,
-            'key': provider_id,
-            'writeout': "True",
-            'site': site_library,
-        }
-        response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
-                                 auth=(username, password))
-        response.raise_for_status()
-        if response.status_code == requests_codes.ok:
-            return response.json()
+
+    files = {'data': open(course, 'rb')}
+
+    data = {
+        'admin': admin_level,
+        'key': provider_id,
+        'site': site_library,
+        'writeout': "True"
+    }
+
+    response = requests.post(url, headers=headers,
+                             files=files, data=data, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests_codes.ok:
+        return response.json()
 
 
 def restore_course(course, host, username, password, ntiid, ua_string):
@@ -112,30 +118,31 @@ def restore_course(course, host, username, password, ntiid, ua_string):
     headers = {
         'user-agent': ua_string
     }
-    with open(course, "rb") as fp:
-        files = {'data': fp}
-        response = requests.post(url, headers=headers, files=files, 
-                                 auth=(username, password))
-        response.raise_for_status()
-        if response.status_code == requests_codes.ok:
-            return response.json()
+
+    files = {'data': open(course, 'rb')}
+
+    response = requests.post(url, headers=headers,
+                             files=files, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests_codes.ok:
+        return response.json()
 
 
-def upload_rendered_content(content, host, username, password, 
-                            site_library, ua_string):
+def upload_rendered_content(content, host, username, password, site_library, ua_string):
     url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
     headers = {
         'user-agent': ua_string
     }
-    with open(content, "rb") as fp:
-        files = {'data': fp}
-        data = {
-            'obfuscate': True,
-            'site': site_library
-        }
-        response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
-                                 auth=(username, password))
-        response.raise_for_status()
-        if response.status_code == requests_codes.ok:
-            return response.json()
+
+    files = {'data': open(content, 'rb')}
+
+    data = {
+        'obfuscate': True,
+        'site': site_library
+    }
+
+    response = requests.post(url, headers=headers,
+                             files=files, data=data, auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests_codes.ok:
+        return response.json()
