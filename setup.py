@@ -9,7 +9,7 @@ entry_points = {
         'nti_import_course = nti.deploymenttools.content.import_course_bundle:main',
         'nti_manage_course = nti.deploymenttools.content.manage_course:main',
         'nti_remote_render = nti.deploymenttools.content.remote_render:main',
-        'nti_render_content = nti.deploymenttools.content.render:main',
+        'nti_render_content = nti.deploymenttools.content.render_content:main',
         'nti_restore_course = nti.deploymenttools.content.restore_course_bundle:main',
     ]
 }
