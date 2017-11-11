@@ -16,9 +16,9 @@ import argparse
 from nti.deploymenttools.content import restore_course
 from nti.deploymenttools.content import configure_logging
 
-UA_STRING = 'NextThought Course Restore Utility'
-
 logger = __import__('logging').getLogger(__name__)
+
+UA_STRING = 'NextThought Course Restore Utility'
 
 
 def _parse_args(args=None):
