@@ -1,48 +1,38 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-.. $Id$
-"""
 
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
-
-import os
 import logging
+import os
 
+from argparse import ArgumentParser
+from getpass import getpass
 from shutil import copy2
 from shutil import rmtree
-from getpass import getpass
-from zipfile import ZipFile
 from tempfile import mkdtemp
-from argparse import ArgumentParser
 from six.moves.urllib.parse import unquote
+from zipfile import ZipFile
 
 import requests
-
 import simplejson as json
 
-from nti.deploymenttools.content import export_course
-from nti.deploymenttools.content import import_course
 from nti.deploymenttools.content import archive_directory
 from nti.deploymenttools.content import configure_logging
+from nti.deploymenttools.content import export_course
+from nti.deploymenttools.content import import_course
+from nti.deploymenttools.content import restore_course
+
+logger = __import__('logging').getLogger(__name__)
+logging.captureWarnings(True)
 
 requests_codes = requests.codes
 
 UA_STRING = 'NextThought Course Management Utility'
 
-logger = __import__('logging').getLogger(__name__)
-logging.captureWarnings(True)
-
-
 def _remove_path(path):
     if path and os.path.exists(path):
         rmtree(path)
 
-
 def get_course_catalog_entry(course_ntiid, host, username, password,
-                             ua_string=UA_STRING):
+                             ua_string):
     url = 'https://%s/dataserver2/Objects/%s/' % (host, course_ntiid)
     headers = {
         'user-agent': ua_string
@@ -53,9 +43,7 @@ def get_course_catalog_entry(course_ntiid, host, username, password,
     if response.status_code == requests_codes.ok:
         return response.json()
 
-
-def get_course_instance(course_ntiid, host, username, password, 
-                        ua_string=UA_STRING):
+def get_course_instance(course_ntiid, host, username, password, ua_string):
     headers = {
         'user-agent': ua_string
     }
@@ -66,13 +54,12 @@ def get_course_instance(course_ntiid, host, username, password,
     url = None
     for link in course_catalog_entry['Links']:
         if link['rel'] == 'CourseInstance':
-            url = 'https://%s%s' % (host, link['href'])
+            url = 'https://%s%s' % (host,link['href'])
 
     response = requests.get(url, headers=headers, auth=(username, password))
     response.raise_for_status()
     if response.status_code == requests_codes.ok:
         return response.json()
-
 
 def _get_course_tuple(course_catalog_entry):
     href = course_catalog_entry['href'].split('/')
@@ -81,9 +68,8 @@ def _get_course_tuple(course_catalog_entry):
     provider_id = unquote(href[7])
     return site_library, admin_level, provider_id
 
-
 def _is_duplicate_discussion(host, username, password, course_instance,
-                             discussion, ua_string=UA_STRING):
+                             discussion, ua_string):
     headers = {
         'user-agent': ua_string
     }
@@ -91,7 +77,7 @@ def _is_duplicate_discussion(host, username, password, course_instance,
     url = None
     for link in course_instance['Links']:
         if link['rel'] == 'CourseDiscussions':
-            url = 'https://%s%s' % (host, link['href'])
+            url = 'https://%s%s' % (host,link['href'])
 
     response = requests.get(url, headers=headers, auth=(username, password))
     response.raise_for_status()
@@ -105,12 +91,11 @@ def _is_duplicate_discussion(host, username, password, course_instance,
                 return True
     return False
 
-
 def register_discussion(course_ntiid, host, username, password,
-                        discussion_path, ua_string=UA_STRING):
+                        discussion_path, ua_string):
     headers = {
-        'user-agent': ua_string,
         'Content-Type': 'application/json',
+        'user-agent': ua_string,
         'X-Requested-With': 'XMLHttpRequest'
     }
 
@@ -119,7 +104,7 @@ def register_discussion(course_ntiid, host, username, password,
     url = None
     for link in course_instance['Links']:
         if link['rel'] == 'CourseDiscussions':
-            url = 'https://%s%s' % (host, link['href'])
+            url = 'https://%s%s' % (host,link['href'])
     try:
         with open(os.path.abspath(os.path.expanduser(discussion_path)), 'rb') as fp:
             discussion = json.load(fp)
@@ -140,12 +125,11 @@ def register_discussion(course_ntiid, host, username, password,
     except requests.exceptions.HTTPError as e:
         logger.error(e)
 
-
 def create_discussions(course_ntiid, host, username, password,
-                       discussion_paths, ua_string=UA_STRING):
+                       discussion_paths, ua_string):
     course_instance = get_course_instance(course_ntiid, host, username,
                                           password, ua_string)
-    url = 'https://%s%s/@@CreateDiscussionTopics' % (host, course_instance['href'])
+    url = 'https://%s%s/@@CreateDiscussionTopics' % (host,course_instance['href'])
     headers = {
         'user-agent': ua_string
     }
@@ -162,7 +146,6 @@ def create_discussions(course_ntiid, host, username, password,
             else:
                 logger.info(response.status_code)
 
-
 def _update_course_archive(course_archive, **kwargs):
     temp_dir = mkdtemp()
 
@@ -177,7 +160,7 @@ def _update_course_archive(course_archive, **kwargs):
         for key in kwargs:
             if key == 'asset_path':
                 logger.debug('Clearing old presentation assets')
-                _remove_path(os.path.join(temp_dir, 'presentation-assets'))
+                _remove_path(os.path.join(temp_dir,'presentation-assets'))
             if key == 'discussion_paths':
                 discussion_dir = os.path.join(temp_dir, 'Discussions')
                 if not os.path.exists(discussion_dir):
@@ -190,11 +173,11 @@ def _update_course_archive(course_archive, **kwargs):
                 for path in ['bundle_dc_metadata.xml', 'dc_metadata.xml']:
                     logger.debug('Copying %s to %s', metadata_path,
                                  os.path.join(temp_dir, path))
-                    copy2(metadata_path, os.path.join(temp_dir, path))
+                    copy2(metadata_path,os.path.join(temp_dir, path))
             if key == 'vendor_path':
                 vendor_path = kwargs[key]
                 logger.debug('Copying %s to %s', vendor_path, temp_dir)
-                copy2(vendor_path, temp_dir)
+                copy2(vendor_path,temp_dir)
 
         archive_directory(temp_dir, modified_course_archive)
     finally:
@@ -208,41 +191,35 @@ def _update_course_archive(course_archive, **kwargs):
                 for root, _, files in os.walk(asset_path):
                     for source in files or ():
                         file_path = os.path.join(root, source)
-                        archive_file_path = file_path.replace(
-                            asset_path, '', 1)
+                        archive_file_path = file_path.replace(asset_path, '', 1)
                         archive_file_path = os.path.join('presentation-assets',
-                                                         archive_file_path)
+                                                     archive_file_path)
                         logger.debug('Adding %s to the archive as %s.' %
                                      (file_path, archive_file_path))
                         archive.write(file_path, archive_file_path)
 
     return modified_course_archive
 
-
-def update_course(host, username, password, course_ntiid,
-                  ua_string=UA_STRING, **kwargs):
+def update_course(host, username, password, course_ntiid, ua_string, **kwargs):
     cwd = os.getcwd()
     working_dir = mkdtemp()
     try:
         os.chdir(working_dir)
         course_archive = export_course(course_ntiid, host, username,
-                                       password, ua_string, backup=True)
+                                       password, UA_STRING, backup=True)
         course_archive = _update_course_archive(course_archive, **kwargs)
 
         course_catalog_entry = get_course_catalog_entry(course_ntiid, host,
                                                         username, password,
-                                                        ua_string)
-        site_library, admin_level, provider_id = _get_course_tuple(
-            course_catalog_entry)
+                                                        UA_STRING)
+        site_library, admin_level, provider_id = _get_course_tuple(course_catalog_entry)
         import_course(course_archive, host, username, password, site_library,
                       admin_level, provider_id, ua_string)
     finally:
         _remove_path(working_dir)
-        os.chdir(cwd)
-
 
 def _parse_args():
-    arg_parser = ArgumentParser(description=UA_STRING)
+    arg_parser = ArgumentParser( description=UA_STRING )
     arg_parser.add_argument('-v', '--verbose', dest='loglevel',
                             action='store_const', const=logging.DEBUG,
                             help="Print debugging logs.")
@@ -250,10 +227,10 @@ def _parse_args():
                             action='store_const', const=logging.WARNING,
                             help="Print warning and error logs only.")
 
-    subparsers = arg_parser.add_subparsers(dest='subparser_name')
+    subparsers =  arg_parser.add_subparsers(dest='subparser_name')
 
     dcmetadata_parser = subparsers.add_parser('dcmetadata',
-                                              description='Dublin Core Metadata Management')
+                            description='Dublin Core Metadata Management')
     dcmetadata_parser.add_argument('-n', '--ntiid', dest='ntiid',
                                    help="NTIID of the course.")
     dcmetadata_parser.add_argument('-s', '--server', dest='host',
@@ -264,7 +241,7 @@ def _parse_args():
                                    help="New dc metadata info file to upload.")
 
     discussion_parser = subparsers.add_parser('discussions',
-                                              description='Discussion Management')
+                            description='Discussion Management')
     discussion_parser.add_argument('-n', '--ntiid', dest='ntiid',
                                    help="NTIID of the course.")
     discussion_parser.add_argument('-s', '--server', dest='host',
@@ -275,7 +252,7 @@ def _parse_args():
                                    nargs='*', help="Discussions to add.")
 
     presentation_parser = subparsers.add_parser('presentationassets',
-                                                description='Presentation Asset Management')
+                            description='Presentation Asset Management')
     presentation_parser.add_argument('-n', '--ntiid', dest='ntiid',
                                      help="NTIID of the course.")
     presentation_parser.add_argument('-s', '--server', dest='host',
@@ -286,7 +263,7 @@ def _parse_args():
                                      help="Path to new presentation assets.")
 
     vendorinfo_parser = subparsers.add_parser('vendorinfo',
-                                              description='Vendor Info Management')
+                            description='Vendor Info Management')
     vendorinfo_parser.add_argument('-n', '--ntiid', dest='ntiid',
                                    help="NTIID of the course.")
     vendorinfo_parser.add_argument('-s', '--server', dest='host',
@@ -297,7 +274,6 @@ def _parse_args():
                                    help="New vendor info file to upload.")
 
     return arg_parser.parse_args()
-
 
 def main():
     # Parse command line args
@@ -310,8 +286,7 @@ def main():
         if args.file:
             try:
                 metadata_path = os.path.abspath(os.path.expanduser(args.file))
-                password = getpass('Password for %s@%s: ' %
-                                   (args.user, args.host))
+                password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
                               UA_STRING, metadata_path=metadata_path)
             except requests.exceptions.HTTPError as e:
@@ -321,8 +296,7 @@ def main():
             try:
                 discussions = []
                 for path in args.discussions:
-                    path = os.path.expanduser(path)
-                    discussions.append(os.path.abspath(path))
+                    discussions.append(os.path.abspath(os.path.expanduser(path)))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
                               UA_STRING, discussion_paths=discussions)
@@ -332,8 +306,7 @@ def main():
         if args.file:
             try:
                 asset_path = os.path.abspath(os.path.expanduser(args.file))
-                password = getpass('Password for %s@%s: ' %
-                                   (args.user, args.host))
+                password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
                               UA_STRING, asset_path=asset_path)
             except requests.exceptions.HTTPError as e:
@@ -342,13 +315,11 @@ def main():
         if args.file:
             try:
                 vendor_path = os.path.abspath(os.path.expanduser(args.file))
-                password = getpass('Password for %s@%s: ' %
-                                   (args.user, args.host))
+                password = getpass('Password for %s@%s: ' % (args.user, args.host))
                 update_course(args.host, args.user, password, args.ntiid,
                               UA_STRING, vendor_path=vendor_path)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
 
-
-if __name__ == '__main__':  # pragma: no cover
-    main()
+if __name__ == '__main__': # pragma: no cover
+        main()
