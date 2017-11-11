@@ -23,9 +23,9 @@ from nti.deploymenttools.content import configure_logging
 
 UA_STRING = 'NextThought Remote Render Utility'
 
-logger = __import__('logging').getLogger(__name__)
-
 requests_codes = requests.codes
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _remove_path(path):
@@ -101,12 +101,11 @@ def remote_render(host, user, password, site_library, working_dir,
 
         if response.status_code == requests_codes.ok:
             _monitor_job(response, host, user, password, poll_interval)
-
-    except requests.HTTPError:
-        logger.exception("Request HTTP error")
     except requests.exceptions.ReadTimeout:
         logger.warning('No response from %s while attempting to render %s.',
                        host, working_dir)
+    except Exception:
+        logger.exception("Request error")
     finally:
         if cleanup:
             _remove_path(temp_dir)

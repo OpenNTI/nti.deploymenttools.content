@@ -30,9 +30,9 @@ from nti.deploymenttools.content import configure_logging
 from nti.deploymenttools.content import upload_rendered_content
 from nti.deploymenttools.content import download_rendered_content
 
-logger = __import__('logging').getLogger(__name__)
-
 UA_STRING = 'NextThought Course Copy Utility'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _get_content_packages(course_archive):
