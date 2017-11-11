@@ -136,7 +136,7 @@ def register_discussion(course_ntiid, host, username, password,
             else:
                 logger.info('Discussion %s is a duplicate.',
                             discussion['title'])
-    except requests.exceptions.HTTPError as e:
+    except Exception as e:
         logger.error(e)
 
 
@@ -231,8 +231,8 @@ def update_course(host, username, password, course_ntiid,
         course_catalog_entry = get_course_catalog_entry(course_ntiid, host,
                                                         username, password,
                                                         ua_string)
-        site_library, admin_level, provider_id = _get_course_tuple(
-            course_catalog_entry)
+        data = _get_course_tuple(course_catalog_entry)
+        site_library, admin_level, provider_id = data
         import_course(course_archive, host, username, password, site_library,
                       admin_level, provider_id, ua_string)
     finally:
