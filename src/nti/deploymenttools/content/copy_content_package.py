@@ -9,11 +9,9 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+import getpass
 import logging
-from getpass import getpass
-from argparse import ArgumentParser
-
-from requests import exceptions as requests_exceptions
+import argparse
 
 from nti.deploymenttools.content import configure_logging
 from nti.deploymenttools.content import upload_rendered_content
@@ -22,7 +20,6 @@ from nti.deploymenttools.content import download_rendered_content
 UA_STRING = 'NextThought Content Package Copy Utility'
 
 logger = __import__('logging').getLogger(__name__)
-logging.captureWarnings(True)
 
 
 def _remove_path(path):
@@ -30,12 +27,12 @@ def _remove_path(path):
         os.remove(path)
 
 
-def copy_content_package(content_ntiid, source_host, dest_host, username,
+def copy_content_package(content_ntiid, source_host, dest_host,
+                         username, password,
                          site_library, cleanup=True):
     content_archive = None
     try:
         logger.info("Downloading content package from %s", source_host)
-        password = getpass('Password for %s@%s: ' % (username, source_host))
         content_archive = download_rendered_content(content_ntiid, source_host,
                                                     username, password, UA_STRING)
 
@@ -45,15 +42,15 @@ def copy_content_package(content_ntiid, source_host, dest_host, username,
                                           username, password, site_library, UA_STRING)
         logger.info('Successfully uploaded as %s',
                     list(content['Items'].keys())[0])
-    except requests_exceptions.HTTPError as e:
-        logger.error(e)
+    except Exception:
+        logger.exception("Error while uploading rendered content")
     finally:
         if cleanup:
             _remove_path(content_archive)
 
 
-def _parse_args():
-    arg_parser = ArgumentParser(description=UA_STRING)
+def _parse_args(args=None):
+    arg_parser = argparse.ArgumentParser(description=UA_STRING)
     arg_parser.add_argument('-n', '--ntiid', dest='content_ntiid',
                             help="NTIID of content to copy.")
     arg_parser.add_argument('-s', '--source-server', dest='source_host',
@@ -73,20 +70,22 @@ def _parse_args():
     arg_parser.add_argument('--no-cleanup', dest='no_cleanup', action='store_false',
                             default=True,
                             help="Do not cleanup process files.")
-    return arg_parser.parse_args()
+    return arg_parser.parse_args(args)
 
 
-def main():
-    # Parse command line args
-    args = _parse_args()
+def main(args=None):
+    args = _parse_args(args)
 
     site_library = args.site_library or args.dest_host
 
     loglevel = args.loglevel or logging.INFO
     configure_logging(level=loglevel)
 
+    msg = 'Password for %s@%s:' % (args.user, args.dest_host)
+    password = getpass.getpass(msg)
+
     copy_content_package(args.content_ntiid, args.source_host,
-                         args.dest_host, args.user, site_library,
+                         args.dest_host, args.user, password, site_library,
                          cleanup=args.no_cleanup)
 
 
