@@ -9,12 +9,12 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+import time
+import shutil
+import getpass
 import logging
-from time import sleep
-from shutil import rmtree
-from getpass import getpass
-from tempfile import mkdtemp
-from argparse import ArgumentParser
+import argparse
+import tempfile
 
 import requests
 
@@ -24,14 +24,13 @@ from nti.deploymenttools.content import configure_logging
 UA_STRING = 'NextThought Remote Render Utility'
 
 logger = __import__('logging').getLogger(__name__)
-logging.captureWarnings(True)
 
 requests_codes = requests.codes
 
 
 def _remove_path(path):
     if path and os.path.exists(path):
-        rmtree(path)
+        shutil.rmtree(path)
 
 
 def remote_render(host, user, password, site_library, working_dir,
@@ -68,7 +67,7 @@ def remote_render(host, user, password, site_library, working_dir,
         status = response.json()['status']
         while status in ('Pending', 'Running'):
             logger.info("Render is %s", status)
-            sleep(poll_interval)
+            time.sleep(poll_interval)
             response = requests.get(status_link, headers=headers,
                                     auth=(user, password))
             response.raise_for_status()
@@ -88,7 +87,7 @@ def remote_render(host, user, password, site_library, working_dir,
 
     logger.info('Submitting render of %s to %s' % (working_dir, host))
     try:
-        temp_dir = mkdtemp()
+        temp_dir = tempfile.mkdtemp()
         logger.info('Using %s to store temporary files' % (temp_dir,))
         content_archive, job_name = _build_archive(working_dir, temp_dir)
 
@@ -113,8 +112,8 @@ def remote_render(host, user, password, site_library, working_dir,
             _remove_path(temp_dir)
 
 
-def _parse_args():
-    arg_parser = ArgumentParser(description="Remote Rendering Utility")
+def _parse_args(args=None):
+    arg_parser = argparse.ArgumentParser(description=UA_STRING)
     arg_parser.add_argument('contentpath',
                             help="Directory containing the content")
     arg_parser.add_argument('-s', '--server', dest='host',
@@ -134,23 +133,30 @@ def _parse_args():
     arg_parser.add_argument('--no-cleanup', dest='cleanup', action='store_false',
                             default=True,
                             help="Do not cleanup process files.")
-    return arg_parser.parse_args()
+    return arg_parser.parse_args(args)
 
 
-def main():
-    args = _parse_args()
+def main(args=None):
+    args = _parse_args(args)
 
-    site_library = args.site_library or args.host
-
+    # set logging level
     loglevel = args.loglevel or logging.INFO
     configure_logging(level=loglevel)
 
-    password = getpass('Password for %s@%s: ' % (args.user, args.host))
+    # get password
+    msg = 'Password for %s@%s: ' % (args.user, args.dest_host)
+    password = getpass.getpass(msg)
+
+    # working directory
     working_dir = os.path.abspath(os.path.expanduser(args.contentpath))
     if os.path.isfile(working_dir):
         working_dir = os.path.dirname(working_dir)
-    logger.info(working_dir)
+    logger.info("Working directory %s", working_dir)
 
+    # site library
+    site_library = args.site_library or args.host
+
+    # render
     remote_render(args.host, args.user, password, site_library,
                   working_dir, args.poll_interval, cleanup=args.cleanup)
 
