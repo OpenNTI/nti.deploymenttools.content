@@ -60,6 +60,7 @@ setup(
         'requests',
         'simplejson',
         'six',
+        'zope.component',
         'zope.exceptions',
     ],
     extras_require={
