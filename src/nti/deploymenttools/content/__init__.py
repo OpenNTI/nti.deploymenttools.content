@@ -48,12 +48,19 @@ def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
 CHUNK_SIZE = 1024 * 1024
 
 
-def download_rendered_content(content_ntiid, host, username, password, ua_string):
+def download_rendered_content(content_ntiid, host, username, password,
+                              ua_string=None, output_dir=None):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, content_ntiid)
-    headers = {
-        'user-agent': ua_string
-    }
+    if ua_string:
+        headers = {
+            'user-agent': ua_string
+        }
+    else:
+        headers = None
     content_archive = '.'.join([content_ntiid, 'zip'])
+    if output_dir:
+        content_archive = os.path.join(output_dir, content_archive)
+    # request content
     response = requests.get(url, stream=True, headers=headers,
                             auth=(username, password))
     response.raise_for_status()
@@ -65,15 +72,21 @@ def download_rendered_content(content_ntiid, host, username, password, ua_string
         return content_archive
 
 
-def export_course(course_ntiid, host, username, password, ua_string, backup=False):
+def export_course(course_ntiid, host, username, password,
+                  ua_string=None, backup=False, output_dir=None):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, course_ntiid)
-    headers = {
-        'user-agent': ua_string
-    }
+    if ua_string:
+        headers = {
+            'user-agent': ua_string
+        }
+    else:
+        headers = None
     body = {
         'backup': backup
     }
     course_archive = '.'.join([course_ntiid, 'zip'])
+    if output_dir:
+        course_archive = os.path.join(output_dir, course_archive)
     response = requests.get(url, stream=True, headers=headers,
                             params=body, auth=(username, password))
     response.raise_for_status()
@@ -85,12 +98,15 @@ def export_course(course_ntiid, host, username, password, ua_string, backup=Fals
         return course_archive
 
 
-def import_course(course, host, username, password, site_library, 
-                  admin_level, provider_id, ua_string):
+def import_course(course, host, username, password, site_library,
+                  admin_level, provider_id, ua_string=None):
     url = 'https://%s/dataserver2/CourseAdmin/@@ImportCourse' % host
-    headers = {
-        'user-agent': ua_string
-    }
+    if ua_string:
+        headers = {
+            'user-agent': ua_string
+        }
+    else:
+        headers = None
     with open(course, "rb") as fp:
         files = {'data': fp}
         data = {
@@ -100,33 +116,39 @@ def import_course(course, host, username, password, site_library,
             'site': site_library,
         }
         response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
+                                 files=files, data=data,
                                  auth=(username, password))
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
             return response.json()
 
 
-def restore_course(course, host, username, password, ntiid, ua_string):
+def restore_course(course, host, username, password, ntiid, ua_string=None):
     url = 'https://%s/dataserver2/Objects/%s/@@Import' % (host, ntiid)
-    headers = {
-        'user-agent': ua_string
-    }
+    if ua_string:
+        headers = {
+            'user-agent': ua_string
+        }
+    else:
+        headers = None
     with open(course, "rb") as fp:
         files = {'data': fp}
-        response = requests.post(url, headers=headers, files=files, 
+        response = requests.post(url, headers=headers, files=files,
                                  auth=(username, password))
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
             return response.json()
 
 
-def upload_rendered_content(content, host, username, password, 
-                            site_library, ua_string):
+def upload_rendered_content(content, host, username, password,
+                            site_library, ua_string=None):
     url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
-    headers = {
-        'user-agent': ua_string
-    }
+    if ua_string:
+        headers = {
+            'user-agent': ua_string
+        }
+    else:
+        headers = None
     with open(content, "rb") as fp:
         files = {'data': fp}
         data = {
@@ -134,7 +156,7 @@ def upload_rendered_content(content, host, username, password,
             'site': site_library
         }
         response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
+                                 files=files, data=data,
                                  auth=(username, password))
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
