@@ -15,6 +15,7 @@ entry_points = {
 }
 
 TESTS_REQUIRE = [
+    'fudge',
     'nti.testing',
     'zope.testrunner',
 ]
@@ -59,6 +60,7 @@ setup(
         'requests',
         'simplejson',
         'six',
+        'zope.component',
         'zope.exceptions',
     ],
     extras_require={
