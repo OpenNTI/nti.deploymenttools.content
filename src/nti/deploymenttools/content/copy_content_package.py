@@ -16,8 +16,8 @@ from argparse import ArgumentParser
 from requests import exceptions as requests_exceptions
 
 from nti.deploymenttools.content import configure_logging
-from nti.deploymenttools.content import upload_rendered_content
 from nti.deploymenttools.content import download_rendered_content
+from nti.deploymenttools.content import upload_rendered_content
 
 UA_STRING = 'NextThought Content Package Copy Utility'
 
