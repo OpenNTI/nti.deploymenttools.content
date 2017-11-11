@@ -28,12 +28,12 @@ from nti.deploymenttools.content import import_course
 from nti.deploymenttools.content import archive_directory
 from nti.deploymenttools.content import configure_logging
 
-logger = __import__('logging').getLogger(__name__)
-logging.captureWarnings(True)
-
 requests_codes = requests.codes
 
 UA_STRING = 'NextThought Course Management Utility'
+
+logger = __import__('logging').getLogger(__name__)
+logging.captureWarnings(True)
 
 
 def _remove_path(path):
