@@ -18,9 +18,9 @@ import requests
 
 from zope.exceptions.log import Formatter as ZopeLogFormatter
 
-logger = __import__('logging').getLogger(__name__)
-
 requests_codes = requests.codes
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def archive_directory(source_path, archive_path):

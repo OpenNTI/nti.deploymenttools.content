@@ -28,15 +28,19 @@ def _parse_args(args=None):
                             help="Destination server.")
     arg_parser.add_argument('-u', '--user', dest='user',
                             help="User to authenticate with the server.")
-    arg_parser.add_argument('-a', '--admin-level', dest='admin_level', default='DefaultAPIRestored',
+    arg_parser.add_argument('-a', '--admin-level', dest='admin_level', 
+                            default='DefaultAPIRestored',
                             help="Specifies the organizational admin level for the course.")
     arg_parser.add_argument('-p', '--provider-id', dest='provider_id',
                             help="Custom provider id for the copied course.")
     arg_parser.add_argument('--site-library', dest='site_library',
-                            help="Site library to add content to. Defaults to the hostname of the destination server.")
-    arg_parser.add_argument('-v', '--verbose', dest='loglevel', action='store_const', const=logging.DEBUG,
+                            help="Site library to add content to. "
+                            "Defaults to the hostname of the destination server.")
+    arg_parser.add_argument('-v', '--verbose', dest='loglevel', action='store_const', 
+                            const=logging.DEBUG,
                             help="Print debugging logs.")
-    arg_parser.add_argument('-q', '--quiet', dest='loglevel', action='store_const', const=logging.WARNING,
+    arg_parser.add_argument('-q', '--quiet', dest='loglevel', action='store_const', 
+                            const=logging.WARNING,
                             help="Print warning and error logs only.")
     return arg_parser.parse_args(args)
 
@@ -54,13 +58,16 @@ def main(args=None):
 
     msg = 'Password for %s@%s: ' % (args.user, args.dest_host)
     password = getpass.getpass(msg)
+
     logger.info("Importing course from %s to %s",
                 archive, args.dest_host)
+
     course = import_course(archive, args.dest_host, args.user,
                            password, site_library, args.admin_level,
                            args.provider_id, UA_STRING)
-    logger.info('Course imported sucessfully as %s.' %
-                (course['Course']['NTIID'],))
+
+    logger.info('Course imported sucessfully as %s.',
+                course['Course']['NTIID'])
 
 
 if __name__ == '__main__':  # pragma: no cover
