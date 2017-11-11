@@ -39,11 +39,10 @@ def archive_directory(source_path, archive_path):
 DEFAULT_LOG_FORMAT = '[%(asctime)-15s] [%(name)s] %(levelname)s: %(message)s'
 
 
-def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT, warnings=True):
+def configure_logging(level=logging.INFO, fmt=DEFAULT_LOG_FORMAT):
     level = logging.INFO if not isinstance(level, int) else level
     logging.basicConfig(level=level)
     logging.root.handlers[0].setFormatter(ZopeLogFormatter(fmt))
-    logging.captureWarnings(warnings)
 
 
 CHUNK_SIZE = 1024 * 1024
