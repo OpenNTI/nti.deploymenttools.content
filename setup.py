@@ -56,7 +56,6 @@ setup(
         'setuptools',
         'boto',
         'isodate',
-        'nti.contentrendering',
         'requests',
         'simplejson',
         'six',
