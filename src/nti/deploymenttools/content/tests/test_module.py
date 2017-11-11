@@ -19,10 +19,7 @@ import tempfile
 import fudge
 
 from nti.deploymenttools.content import export_course
-from nti.deploymenttools.content import import_course
-from nti.deploymenttools.content import restore_course
 from nti.deploymenttools.content import archive_directory
-from nti.deploymenttools.content import upload_rendered_content
 from nti.deploymenttools.content import download_rendered_content
 
 import unittest
@@ -62,7 +59,7 @@ class TestModule(unittest.TestCase):
                         is_(True))
         finally:
             shutil.rmtree(tmpdir, True)
-
+    
     @fudge.patch('nti.deploymenttools.content.requests')
     def test_export_course(self, mock_rq):
         path = os.path.join(os.path.dirname(__file__),
@@ -76,50 +73,10 @@ class TestModule(unittest.TestCase):
 
         tmpdir = tempfile.mkdtemp()
         try:
-            archive = export_course('tag:nextthought.com,2011-10:NTI-CourseInfo-Bleach',
-                                    'alpha.dev', 'aizen', 'captain',
+            archive = export_course("bleach", 'alpha.dev','aizen', 'captain',
                                     None, False, tmpdir)
             assert_that(os.path.exists(archive), is_(True))
             assert_that(zipfile.is_zipfile(archive),
                         is_(True))
         finally:
             shutil.rmtree(tmpdir, True)
-
-    @fudge.patch('nti.deploymenttools.content.requests')
-    def test_import_course(self, mock_rq):
-        path = os.path.join(os.path.dirname(__file__),
-                            'data', 'course.zip')
-        response = (fudge.Fake().has_attr(status_code=200)
-                    .expects('raise_for_status')
-                    .expects('json').returns({'Class': 'Course'}))
-        mock_rq.provides('post').returns(response)
-
-        result = import_course(path, 'alpha.dev', 'aizen', 'captain',
-                               'alpha.dev', 'Anime', 'Bleach')
-        assert_that(result, is_(dict))
-
-    @fudge.patch('nti.deploymenttools.content.requests')
-    def test_restore_course(self, mock_rq):
-        path = os.path.join(os.path.dirname(__file__),
-                            'data', 'course.zip')
-        response = (fudge.Fake().has_attr(status_code=200)
-                    .expects('raise_for_status')
-                    .expects('json').returns({'Class': 'Course'}))
-        mock_rq.provides('post').returns(response)
-
-        result = restore_course(path, 'alpha.dev', 'aizen', 'captain',
-                                'tag:nextthought.com,2011-10:NTI-CourseInfo-Bleach')
-        assert_that(result, is_(dict))
-
-    @fudge.patch('nti.deploymenttools.content.requests')
-    def test_upload_rendered_content(self, mock_rq):
-        path = os.path.join(os.path.dirname(__file__),
-                            'data', 'content.zip')
-        response = (fudge.Fake().has_attr(status_code=200)
-                    .expects('raise_for_status')
-                    .expects('json').returns({'Class': 'ContentPackage'}))
-        mock_rq.provides('post').returns(response)
-
-        result = upload_rendered_content(path, 'alpha.dev', 'aizen', 'captain',
-                                         'alpha.dev')
-        assert_that(result, is_(dict))
