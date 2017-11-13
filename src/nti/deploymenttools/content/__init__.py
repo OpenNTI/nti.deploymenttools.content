@@ -49,9 +49,9 @@ CHUNK_SIZE = 1024 * 1024
 
 
 def download_rendered_content(content_ntiid, host, username, password,
-                              ua_string=None, output_dir=None):
+                              ua_string, output_dir=None):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, content_ntiid)
-    headers = {'user-agent': ua_string} if ua_string else None
+    headers = {'user-agent': ua_string}
     content_archive = '.'.join([content_ntiid, 'zip'])
     if output_dir:
         content_archive = os.path.join(output_dir, content_archive)
@@ -68,9 +68,9 @@ def download_rendered_content(content_ntiid, host, username, password,
 
 
 def export_course(course_ntiid, host, username, password,
-                  ua_string=None, backup=False, output_dir=None):
+                  ua_string, backup=False, output_dir=None):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, course_ntiid)
-    headers = {'user-agent': ua_string} if ua_string else None
+    headers = {'user-agent': ua_string}
     body = {
         'backup': backup
     }
@@ -89,9 +89,9 @@ def export_course(course_ntiid, host, username, password,
 
 
 def import_course(course, host, username, password, site_library,
-                  admin_level, provider_id, ua_string=None):
+                  admin_level, provider_id, ua_string):
     url = 'https://%s/dataserver2/CourseAdmin/@@ImportCourse' % host
-    headers = {'user-agent': ua_string} if ua_string else None
+    headers = {'user-agent': ua_string}
     with open(course, "rb") as fp:
         files = {'data': fp}
         data = {
@@ -108,9 +108,9 @@ def import_course(course, host, username, password, site_library,
             return response.json()
 
 
-def restore_course(course, host, username, password, ntiid, ua_string=None):
+def restore_course(course, host, username, password, ntiid, ua_string):
     url = 'https://%s/dataserver2/Objects/%s/@@Import' % (host, ntiid)
-    headers = {'user-agent': ua_string} if ua_string else None
+    headers = {'user-agent': ua_string}
     with open(course, "rb") as fp:
         files = {'data': fp}
         response = requests.post(url, headers=headers, files=files,
@@ -121,9 +121,9 @@ def restore_course(course, host, username, password, ntiid, ua_string=None):
 
 
 def upload_rendered_content(content, host, username, password,
-                            site_library, ua_string=None):
+                            site_library, ua_string):
     url = 'https://%s/dataserver2/Library/@@ImportRenderedContent' % host
-    headers = {'user-agent': ua_string} if ua_string else None
+    headers = {'user-agent': ua_string}
     with open(content, "rb") as fp:
         files = {'data': fp}
         data = {
