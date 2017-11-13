@@ -29,7 +29,7 @@ def archive_directory(source_path, archive_path):
     logger.debug("Archiving %s", source_path)
     filename = tempfile.mktemp()
     try:
-        shutil.make_archive(filename, "zip", source_path)
+        shutil.make_archive(filename, "zip", source_path, source_path)
     finally:
         logger.debug('Creating archive %s' % (archive_path,))
         shutil.move(filename + ".zip", archive_path)
