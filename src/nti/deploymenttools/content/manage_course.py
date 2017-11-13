@@ -42,7 +42,7 @@ def _remove_path(path):
 
 
 def get_course_catalog_entry(course_ntiid, host, username, password,
-                             ua_string=UA_STRING):
+                             ua_string):
     url = 'https://%s/dataserver2/Objects/%s/' % (host, course_ntiid)
     headers = {
         'user-agent': ua_string
@@ -55,7 +55,7 @@ def get_course_catalog_entry(course_ntiid, host, username, password,
 
 
 def get_course_instance(course_ntiid, host, username, password, 
-                        ua_string=UA_STRING):
+                        ua_string):
     headers = {
         'user-agent': ua_string
     }
@@ -83,7 +83,7 @@ def _get_course_tuple(course_catalog_entry):
 
 
 def _is_duplicate_discussion(host, username, password, course_instance,
-                             discussion, ua_string=UA_STRING):
+                             discussion, ua_string):
     headers = {
         'user-agent': ua_string
     }
@@ -107,7 +107,7 @@ def _is_duplicate_discussion(host, username, password, course_instance,
 
 
 def register_discussion(course_ntiid, host, username, password,
-                        discussion_path, ua_string=UA_STRING):
+                        discussion_path, ua_string):
     headers = {
         'user-agent': ua_string,
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ def register_discussion(course_ntiid, host, username, password,
 
 
 def create_discussions(course_ntiid, host, username, password,
-                       discussion_paths, ua_string=UA_STRING):
+                       discussion_paths, ua_string):
     course_instance = get_course_instance(course_ntiid, host, username,
                                           password, ua_string)
     url = 'https://%s%s/@@CreateDiscussionTopics' % (host, course_instance['href'])
@@ -220,7 +220,7 @@ def _update_course_archive(course_archive, **kwargs):
 
 
 def update_course(host, username, password, course_ntiid,
-                  ua_string=UA_STRING, **kwargs):
+                  ua_string, **kwargs):
     cwd = os.getcwd()
     working_dir = mkdtemp()
     try:

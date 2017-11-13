@@ -54,9 +54,11 @@ class TestModule(unittest.TestCase):
         mock_rq.provides('get').returns(response)
 
         tmpdir = tempfile.mkdtemp()
+        ua_string = "NextThought Download Rendered Content Unit Test"
         try:
             archive = download_rendered_content("bleach", 'alpha.dev',
-                                                'aizen', 'captain', None, tmpdir)
+                                                'aizen', 'captain', ua_string,
+                                                tmpdir)
             assert_that(os.path.exists(archive), is_(True))
             assert_that(zipfile.is_zipfile(archive),
                         is_(True))
@@ -75,10 +77,11 @@ class TestModule(unittest.TestCase):
         mock_rq.provides('get').returns(response)
 
         tmpdir = tempfile.mkdtemp()
+        ua_string = "NextThought Export Course Unit Test"
         try:
             archive = export_course('tag:nextthought.com,2011-10:NTI-CourseInfo-Bleach',
                                     'alpha.dev', 'aizen', 'captain',
-                                    None, False, tmpdir)
+                                    ua_string, False, tmpdir)
             assert_that(os.path.exists(archive), is_(True))
             assert_that(zipfile.is_zipfile(archive),
                         is_(True))
@@ -94,8 +97,9 @@ class TestModule(unittest.TestCase):
                     .expects('json').returns({'Class': 'Course'}))
         mock_rq.provides('post').returns(response)
 
+        ua_string = "NextThought Import Course Unit Test"
         result = import_course(path, 'alpha.dev', 'aizen', 'captain',
-                               'alpha.dev', 'Anime', 'Bleach')
+                               'alpha.dev', 'Anime', 'Bleach', ua_string)
         assert_that(result, is_(dict))
 
     @fudge.patch('nti.deploymenttools.content.requests')
@@ -107,8 +111,10 @@ class TestModule(unittest.TestCase):
                     .expects('json').returns({'Class': 'Course'}))
         mock_rq.provides('post').returns(response)
 
+        ua_string = "NextThought Restore Course Unit Test"
         result = restore_course(path, 'alpha.dev', 'aizen', 'captain',
-                                'tag:nextthought.com,2011-10:NTI-CourseInfo-Bleach')
+                                'tag:nextthought.com,2011-10:NTI-CourseInfo-Bleach',
+                                ua_string)
         assert_that(result, is_(dict))
 
     @fudge.patch('nti.deploymenttools.content.requests')
@@ -120,6 +126,7 @@ class TestModule(unittest.TestCase):
                     .expects('json').returns({'Class': 'ContentPackage'}))
         mock_rq.provides('post').returns(response)
 
+        ua_string = "NextThought Upload Rendered Content Unit Test"
         result = upload_rendered_content(path, 'alpha.dev', 'aizen', 'captain',
-                                         'alpha.dev')
+                                         'alpha.dev', ua_string)
         assert_that(result, is_(dict))
