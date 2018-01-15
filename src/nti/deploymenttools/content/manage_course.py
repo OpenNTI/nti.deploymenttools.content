@@ -218,6 +218,21 @@ def update_course(host, username, password, course_ntiid, ua_string, **kwargs):
     finally:
         _remove_path(working_dir)
 
+def update_vendor_info(host, username, password, course_ntiid, vendor_info, ua_string):
+    course_instance = get_course_instance(course_ntiid, host, username,
+                                          password, ua_string)
+    url = 'https://%s%s/VendorInfo' % (host,course_instance['href'])
+    headers = {
+        'user-agent': ua_string,
+        'Content-Type': 'application/vnd.nextthought+json'
+    }
+    with open(vendor_info, "rb") as fp:
+        response = requests.put(url, headers=headers, data=fp.read(), 
+                                 auth=(username, password))
+        response.raise_for_status()
+        if response.status_code == requests_codes.ok:
+            return response.json()
+
 def _parse_args():
     arg_parser = ArgumentParser( description=UA_STRING )
     arg_parser.add_argument('-v', '--verbose', dest='loglevel',
@@ -316,8 +331,8 @@ def main():
             try:
                 vendor_path = os.path.abspath(os.path.expanduser(args.file))
                 password = getpass('Password for %s@%s: ' % (args.user, args.host))
-                update_course(args.host, args.user, password, args.ntiid,
-                              UA_STRING, vendor_path=vendor_path)
+                update_vendor_info(args.host, args.user, password, args.ntiid,
+                              vendor_path, UA_STRING)
             except requests.exceptions.HTTPError as e:
                 logger.error(e)
 
