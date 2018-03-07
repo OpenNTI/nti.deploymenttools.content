@@ -26,13 +26,18 @@ requests_codes = requests.codes
 def archive_directory(source_path, archive_path):
     if not os.path.isdir(source_path):
         raise ValueError("Invalid source path")
+    base_path = source_path + os.sep
     logger.debug("Archiving %s", source_path)
-    filename = tempfile.mktemp()
-    try:
-        shutil.make_archive(filename, "zip", source_path, source_path)
-    finally:
+
+    with ZipFile(archive_path, 'w') as archive:
         logger.debug('Creating archive %s' % (archive_path,))
-        shutil.move(filename + ".zip", archive_path)
+        for root, _, files in os.walk(source_path):
+            for source in files or ():
+                file_path = os.path.join(root, source)
+                archive_file_path = file_path.replace(base_path, '', 1)
+                logger.debug('Adding %s to the archive as %s.' %
+                             (file_path, archive_file_path))
+                archive.write(file_path, archive_file_path)
     return archive_path
 
 
