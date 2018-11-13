@@ -104,9 +104,14 @@ def import_course(course, host, username, password, site_library,
             'writeout': "True",
             'site': site_library,
         }
-        response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
-                                 auth=(username, password))
+        kwargs = {'url': url,
+                  'headers': headers,
+                  'files': files,
+                  'data': data,
+                  'auth': (username, password)}
+        if '.dev' in url:
+            kwargs['verify'] = False
+        response = requests.post(**kwargs)
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
             return response.json()
@@ -119,8 +124,13 @@ def restore_course(course, host, username, password, ntiid, ua_string):
     }
     with open(course, "rb") as fp:
         files = {'data': fp}
-        response = requests.post(url, headers=headers, files=files, 
-                                 auth=(username, password))
+        kwargs = {'url': url,
+                  'headers': headers,
+                  'files': files,
+                  'auth': (username, password)}
+        if '.dev' in url:
+            kwargs['verify'] = False
+        response = requests.post(**kwargs)
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
             return response.json()
@@ -138,9 +148,14 @@ def upload_rendered_content(content, host, username, password,
             'obfuscate': True,
             'site': site_library
         }
-        response = requests.post(url, headers=headers,
-                                 files=files, data=data, 
-                                 auth=(username, password))
+        kwargs = {'url': url,
+                  'headers': headers,
+                  'files': files,
+                  'data': data,
+                  'auth': (username, password)}
+        if '.dev' in url:
+            kwargs['verify'] = False
+        response = requests.post(**kwargs)
         response.raise_for_status()
         if response.status_code == requests_codes.ok:
             return response.json()
