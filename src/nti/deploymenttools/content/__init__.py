@@ -69,6 +69,17 @@ def download_rendered_content(content_ntiid, host, username, password, ua_string
                     archive.write(chunk)
         return content_archive
 
+def get_course_info(course_ntiid, host, username, password, ua_string):
+    url = 'https://%s/dataserver2/Objects/%s' % (host, course_ntiid)
+    headers = {
+        'user-agent': ua_string
+    }
+    response = requests.get(url, stream=True, headers=headers,
+                            auth=(username, password))
+    response.raise_for_status()
+    if response.status_code == requests_codes.ok:
+        return response.json()
+
 
 def export_course(course_ntiid, host, username, password, ua_string, backup=False):
     url = 'https://%s/dataserver2/Objects/%s/@@Export' % (host, course_ntiid)
