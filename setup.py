@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 entry_points = {
     'console_scripts': [
         'nti_backup_course = nti.deploymenttools.content.backup_course_bundle:main',
+        'nti_backup_full_course = nti.deploymenttools.content.backup_course:main',
         'nti_copy_content_package = nti.deploymenttools.content.copy_content_package:main',
         'nti_copy_course = nti.deploymenttools.content.copy_course:main',
         'nti_import_course = nti.deploymenttools.content.import_course_bundle:main',
