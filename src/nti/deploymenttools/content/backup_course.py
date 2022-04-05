@@ -84,8 +84,8 @@ def backup_course(course_ntiid, source_host, username, output_dir,
             _extract_archive(content_archive[1], content_path)
 
         archive_path = os.path.join(admin_level, '.'.join([provider_id,'zip']))
-        index_info = '"{0}", "{1}", "{2}"'.format(provider_id, course_title, archive_path)
-        index_file = os.path.join(staging_dir, '.'.join([provider_id,'csv']))
+        index_info = u'"{0}", "{1}", "{2}"\n'.format(provider_id, course_title, archive_path)
+        index_file = os.path.join(output_dir, '.'.join([provider_id,'csv']))
 
         with codecs.open(index_file, 'wb', 'utf-8') as fp:
             fp.write(index_info)
